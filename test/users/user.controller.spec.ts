@@ -3,7 +3,7 @@ import { UsersController } from '../../src/users/users.controller';
 import { UsersService } from '../../src/users/users.service';
 import { AuthService } from '../../src/auth/auth.service';
 import { JwtAuthGuard } from '../../src/auth/jwt-auth.guard';
-import { CreateUserDto } from '../../src/users/dto/create-user.dto';
+import { CreateUserDto } from '../../src/app/dto/create-user.dto';
 import { LoginUserDto } from '../../src/auth/dto/login-user.dto';
 
 describe('UsersController', () => {
