@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Schema as MongooseSchema } from 'mongoose';
+import { Document } from 'mongoose';
 
 export type UserDocument = UserSchema & Document;
 
@@ -23,23 +23,23 @@ export class UserSchema {
   @Prop({ default: false })
   isPrivate: boolean;
 
-  @Prop({ type: [MongooseSchema.Types.ObjectId], ref: 'User' })
-  followers: MongooseSchema.Types.ObjectId[];
+  @Prop({ ref: 'User' })
+  followers: string[];
 
-  @Prop({ type: [MongooseSchema.Types.ObjectId], ref: 'User' })
-  following: MongooseSchema.Types.ObjectId[];
+  @Prop({ ref: 'User' })
+  following: string[];
 
-  @Prop({ type: [MongooseSchema.Types.ObjectId], ref: 'User' })
-  blockedUsers: MongooseSchema.Types.ObjectId[];
+  @Prop({ ref: 'User' })
+  blockedUsers: string[];
 
-  @Prop({ type: [MongooseSchema.Types.ObjectId], ref: 'Game' })
-  favorites: MongooseSchema.Types.ObjectId[];
+  @Prop({ ref: 'Game' })
+  favorites: string[];
 
-  @Prop({ type: [MongooseSchema.Types.ObjectId], ref: 'Review' })
-  reviews: MongooseSchema.Types.ObjectId[];
+  @Prop({ ref: 'Review' })
+  reviews: string[];
 
-  @Prop({ type: [MongooseSchema.Types.ObjectId], ref: 'Like' })
-  likes: MongooseSchema.Types.ObjectId[];
+  @Prop({ ref: 'Like' })
+  likes: string[];
 }
 
 export const UserSchemaSchema = SchemaFactory.createForClass(UserSchema);

@@ -26,7 +26,6 @@ export class GameService {
     const addedByStatus = data.added_by_status;
     const stores = data.stores.map((store: any) => ({
       id: store.id,
-      url: store.url,
       store: {
         id: store.store.id,
         name: store.store.name,
@@ -39,6 +38,7 @@ export class GameService {
     const publisher = data.publishers[0]?.name || 'Unknown';
 
     return new Game(
+      null,
       gameId,
       data.name,
       data.description_raw,

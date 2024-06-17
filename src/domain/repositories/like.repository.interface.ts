@@ -8,4 +8,5 @@ export interface ILikeRepository {
     userId: string,
     targetId: string,
   ): Promise<Like | null>;
+  findById(id: string): Promise<Like | null>;
 }

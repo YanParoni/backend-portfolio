@@ -29,6 +29,7 @@ export class ReviewController {
   @UseGuards(JwtAuthGuard)
   @Get('authenticated')
   async findAllAuthenticated(@Req() req: AuthenticatedRequest) {
+    console.log(req.user._id);
     return this.reviewService.findAll(req.user._id);
   }
 
@@ -50,6 +51,6 @@ export class ReviewController {
     @Param('id') reviewId: string,
     @Req() req: AuthenticatedRequest,
   ) {
-    return this.reviewService.deleteReview(reviewId, req.user._id);
+    return this.reviewService.deleteReview(reviewId, req.user.username);
   }
 }

@@ -1,6 +1,7 @@
 export class Game {
   constructor(
     public readonly id: string,
+    public readonly gameId: string,
     public readonly name: string,
     public readonly description: string,
     public readonly rating: number,
@@ -11,7 +12,6 @@ export class Game {
     public readonly publisher: string,
     public readonly stores: {
       id: number;
-      url: string;
       store: {
         id: number;
         name: string;

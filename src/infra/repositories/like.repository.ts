@@ -52,4 +52,9 @@ export class LikeRepository implements ILikeRepository {
       .exec();
     return likeDocument ? this.toDomain(likeDocument) : null;
   }
+
+  async findById(id: string): Promise<LikeEntity | null> {
+    const likeDocument = await this.likeModel.findById(id).exec();
+    return likeDocument ? this.toDomain(likeDocument) : null;
+  }
 }

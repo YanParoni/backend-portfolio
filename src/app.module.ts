@@ -6,7 +6,8 @@ import { AppService } from './app.service';
 import { UserModule } from '@/infra/modules/user.module';
 import { AuthModule } from '@/infra/modules/auth.module';
 import { ReviewModule } from '@/infra/modules/review.module';
-
+import { SocialsModule } from '@/infra/modules/socials.module';
+import { LikeModule } from '@/infra/modules/like.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -16,6 +17,8 @@ import { ReviewModule } from '@/infra/modules/review.module';
     UserModule,
     AuthModule,
     ReviewModule,
+    SocialsModule,
+    LikeModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Schema as MongooseSchema } from 'mongoose';
+import { Model } from 'mongoose';
 import { UserSchema, UserDocument } from '@/infra/schemas/user.schema';
 import { User as UserEntity } from '@/domain/entities/user.entity';
 import { IUserRepository } from '@/domain/repositories/user.repository.interface';
@@ -20,12 +20,12 @@ export class UserRepository implements IUserRepository {
       userDocument.profileImage,
       userDocument.bio,
       userDocument.isPrivate,
-      userDocument.followers.map((f) => f.toString()),
-      userDocument.following.map((f) => f.toString()),
-      userDocument.blockedUsers.map((b) => b.toString()),
-      userDocument.favorites.map((f) => f.toString()),
-      userDocument.reviews.map((r) => r.toString()),
-      userDocument.likes.map((l) => l.toString()),
+      userDocument.followers,
+      userDocument.following,
+      userDocument.blockedUsers,
+      userDocument.favorites,
+      userDocument.reviews,
+      userDocument.likes,
     );
   }
 
@@ -37,20 +37,12 @@ export class UserRepository implements IUserRepository {
       profileImage: user.profileImage,
       bio: user.bio,
       isPrivate: user.isPrivate,
-      followers: user.followers.map(
-        (f) => new MongooseSchema.Types.ObjectId(f),
-      ),
-      following: user.following.map(
-        (f) => new MongooseSchema.Types.ObjectId(f),
-      ),
-      blockedUsers: user.blockedUsers.map(
-        (b) => new MongooseSchema.Types.ObjectId(b),
-      ),
-      favorites: user.favorites.map(
-        (f) => new MongooseSchema.Types.ObjectId(f),
-      ),
-      reviews: user.reviews.map((r) => new MongooseSchema.Types.ObjectId(r)),
-      likes: user.likes.map((l) => new MongooseSchema.Types.ObjectId(l)),
+      followers: user.followers,
+      following: user.following,
+      blockedUsers: user.blockedUsers,
+      favorites: user.favorites,
+      reviews: user.reviews,
+      likes: user.likes,
     };
   }
 

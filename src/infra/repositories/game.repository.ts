@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import { GameSchema, GameDocument } from '@/infra/schemas/game.schema';
 import { Game as GameEntity } from '@/domain/entities/game.entity';
 import { IGameRepository } from '@/domain/repositories/game.repository.interface';
+import { Schema as MongooseSchema } from 'mongoose';
 
 @Injectable()
 export class GameRepository implements IGameRepository {
@@ -13,7 +14,8 @@ export class GameRepository implements IGameRepository {
 
   private toDomain(gameDocument: GameDocument): GameEntity {
     return new GameEntity(
-      gameDocument._id.toString(),
+      gameDocument._id?.toString() || '',
+      gameDocument.gameId,
       gameDocument.name,
       gameDocument.description,
       gameDocument.rating,
@@ -28,7 +30,8 @@ export class GameRepository implements IGameRepository {
 
   private toSchema(game: GameEntity): Partial<GameDocument> {
     return {
-      _id: game.id,
+      _id: game.id ? new MongooseSchema.Types.ObjectId(game.id) : undefined,
+      gameId: game.gameId,
       name: game.name,
       description: game.description,
       rating: game.rating,
@@ -52,8 +55,8 @@ export class GameRepository implements IGameRepository {
     return gameDocuments.map((doc) => this.toDomain(doc));
   }
 
-  async findById(id: string): Promise<GameEntity | null> {
-    const gameDocument = await this.gameModel.findById(id).exec();
+  async findById(gameId: string): Promise<GameEntity | null> {
+    const gameDocument = await this.gameModel.findOne({ gameId }).exec();
     return gameDocument ? this.toDomain(gameDocument) : null;
   }
 }

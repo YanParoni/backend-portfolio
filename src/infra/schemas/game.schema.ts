@@ -5,6 +5,9 @@ export type GameDocument = GameSchema & Document;
 
 @Schema()
 export class GameSchema {
+  @Prop({ required: true, unique: true })
+  gameId: string;
+
   @Prop({ required: true })
   name: string;
 
@@ -34,7 +37,6 @@ export class GameSchema {
     type: [
       {
         id: { type: Number, required: true },
-        url: { type: String, required: true },
         store: {
           id: { type: Number, required: true },
           name: { type: String, required: true },
@@ -48,7 +50,6 @@ export class GameSchema {
   })
   stores: {
     id: number;
-    url: string;
     store: {
       id: number;
       name: string;

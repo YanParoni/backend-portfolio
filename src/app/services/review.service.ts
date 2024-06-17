@@ -78,12 +78,12 @@ export class ReviewService {
     return reviews;
   }
 
-  async deleteReview(reviewId: string, currentUserId: string): Promise<void> {
+  async deleteReview(reviewId: string, currentUsername: string): Promise<void> {
     const review = await this.reviewRepository.findById(reviewId);
     if (!review) {
       throw new NotFoundException('Review not found');
     }
-    if (review.userName !== currentUserId) {
+    if (review.userName !== currentUsername) {
       throw new ForbiddenException('You cannot delete this review');
     }
     await this.reviewRepository.delete(reviewId);
