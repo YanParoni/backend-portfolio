@@ -49,4 +49,22 @@ export class SocialsController {
   ) {
     await this.socialService.unblockUser(req.user._id, userIdToUnblock);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('block-comment/:id')
+  async blockComment(
+    @Req() req: AuthenticatedRequest,
+    @Param('id') commentId: string,
+  ) {
+    await this.socialService.blockComment(req.user._id, commentId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete('unblock-comment/:id')
+  async unblockComment(
+    @Req() req: AuthenticatedRequest,
+    @Param('id') commentId: string,
+  ) {
+    await this.socialService.unblockComment(req.user._id, commentId);
+  }
 }

@@ -11,6 +11,8 @@ import { LikeRepository } from '@/infra/repositories/like.repository';
 import { ReviewRepository } from '@/infra/repositories/review.repository';
 import { GameModule } from '@/infra/modules/game.module';
 import { UserModule } from '@/infra/modules/user.module';
+import { ActivityModule } from '@/infra/modules/activity.module';
+
 @Module({
   imports: [
     MongooseModule.forFeature([
@@ -19,6 +21,7 @@ import { UserModule } from '@/infra/modules/user.module';
     ]),
     GameModule,
     UserModule,
+    ActivityModule,
   ],
   controllers: [LikeController],
   providers: [LikeService, LikeRepository, ReviewRepository],

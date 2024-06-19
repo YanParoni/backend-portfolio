@@ -4,6 +4,7 @@ import { ReviewRepository } from '@/infra/repositories/review.repository';
 import { GameService } from '@/app/services/game.service';
 import { UserRepository } from '@/infra/repositories/user.repository';
 import { Like } from '@/domain/entities/like.entity';
+import { RegisterActivity } from '@/infra/decorators/register.activity.decorator';
 
 @Injectable()
 export class LikeService {
@@ -14,11 +15,15 @@ export class LikeService {
     private readonly userRepository: UserRepository,
   ) {}
 
+  @RegisterActivity('like', 'review', async (context) => {
+    const reviewRepository = context
+      .switchToHttp()
+      .getRequest().reviewRepository;
+    const request = context.switchToHttp().getRequest();
+    const review = await reviewRepository.findById(request.params.reviewId);
+    return { reviewTitle: review.title };
+  })
   async likeReview(userId: string, reviewId: string): Promise<Like> {
-    const review = await this.reviewRepository.findById(reviewId);
-    review.addLike();
-    await this.reviewRepository.update(review);
-
     const like = new Like(null, userId, reviewId, 'review');
     const createdLike = await this.likeRepository.create(like);
 
@@ -26,11 +31,22 @@ export class LikeService {
     user.addLike(createdLike.id);
     await this.userRepository.update(user);
 
+    const review = await this.reviewRepository.findById(reviewId);
+    review.addLike();
+    await this.reviewRepository.update(review);
+
     return createdLike;
   }
 
+  @RegisterActivity('like', 'game', async (context) => {
+    const gameService = context.switchToHttp().getRequest().gameService;
+    const request = context.switchToHttp().getRequest();
+    const game = await gameService.findById(request.params.gameId);
+    return { gameTitle: game.name };
+  })
   async likeGame(userId: string, gameId: string): Promise<Like> {
     const game = await this.gameService.findOrCreateGame(gameId);
+    console.log(game);
     const like = new Like(null, userId, game.gameId, 'game');
     const createdLike = await this.likeRepository.create(like);
 
@@ -41,18 +57,7 @@ export class LikeService {
     return createdLike;
   }
 
-  async unlike(likeId: string): Promise<void> {
-    const like = await this.likeRepository.findById(likeId);
-    if (like.targetType === 'review') {
-      const review = await this.reviewRepository.findById(like.targetId);
-      review.removeLike();
-      await this.reviewRepository.update(review);
-    }
-
-    await this.likeRepository.delete(likeId);
-
-    const user = await this.userRepository.findById(like.userId);
-    user.removeLike(likeId);
-    await this.userRepository.update(user);
+  async unlike(id: string): Promise<void> {
+    await this.likeRepository.delete(id);
   }
 }

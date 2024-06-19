@@ -1,15 +1,17 @@
-// src/app/services/social.service.ts
-
 import {
   Injectable,
   NotFoundException,
   ForbiddenException,
 } from '@nestjs/common';
 import { UserRepository } from '@/infra/repositories/user.repository';
+import { CommentRepository } from '@/infra/repositories/comment.repository';
 
 @Injectable()
 export class SocialService {
-  constructor(private readonly userRepository: UserRepository) {}
+  constructor(
+    private readonly userRepository: UserRepository,
+    private readonly commentRepository: CommentRepository,
+  ) {}
 
   async followUser(
     currentUserId: string,
@@ -77,5 +79,38 @@ export class SocialService {
     currentUser.unblockUser(userIdToUnblock);
 
     await this.userRepository.update(currentUser);
+  }
+
+  async blockComment(currentUserId: string, commentId: string): Promise<void> {
+    const currentUser = await this.userRepository.findById(currentUserId);
+    const comment = await this.commentRepository.findById(commentId);
+
+    if (!currentUser || !comment) {
+      throw new NotFoundException('Comment or User not found');
+    }
+
+    if (comment.authorId === currentUserId) {
+      throw new ForbiddenException('You cannot block your own comment');
+    }
+
+    comment.block();
+
+    await this.commentRepository.update(comment);
+  }
+
+  async unblockComment(
+    currentUserId: string,
+    commentId: string,
+  ): Promise<void> {
+    const currentUser = await this.userRepository.findById(currentUserId);
+    const comment = await this.commentRepository.findById(commentId);
+
+    if (!currentUser || !comment) {
+      throw new NotFoundException('Comment or User not found');
+    }
+
+    comment.unblock();
+
+    await this.commentRepository.update(comment);
   }
 }

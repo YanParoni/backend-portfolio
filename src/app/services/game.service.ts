@@ -16,7 +16,7 @@ export class GameService {
     return game;
   }
 
-  private async fetchGameFromApi(gameId: string): Promise<Game> {
+  async fetchGameFromApi(gameId: string): Promise<Game> {
     const apiKey = process.env.RAWG_API_KEY;
     const response = await axios.get(
       `https://api.rawg.io/api/games/${gameId}?key=${apiKey}`,
