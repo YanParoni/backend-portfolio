@@ -24,7 +24,13 @@ export class ListController {
     @Req() req: AuthenticatedRequest,
     @Body() createListDto: CreateListDto,
   ) {
-    return this.listService.create(createListDto, req.user.username);
+    req.headers['activity-type'] = 'list';
+    req.headers['target-type'] = 'review';
+    return this.listService.create(
+      createListDto,
+      req.user.username,
+      req.user._id,
+    );
   }
 
   @Get()

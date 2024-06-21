@@ -12,7 +12,7 @@ import { ReviewRepository } from '@/infra/repositories/review.repository';
 import { GameModule } from '@/infra/modules/game.module';
 import { UserModule } from '@/infra/modules/user.module';
 import { ActivityModule } from '@/infra/modules/activity.module';
-
+import { ListModule } from './list.module';
 @Module({
   imports: [
     MongooseModule.forFeature([
@@ -22,6 +22,7 @@ import { ActivityModule } from '@/infra/modules/activity.module';
     GameModule,
     UserModule,
     ActivityModule,
+    ListModule,
   ],
   controllers: [LikeController],
   providers: [LikeService, LikeRepository, ReviewRepository],

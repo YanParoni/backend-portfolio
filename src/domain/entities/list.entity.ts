@@ -3,6 +3,7 @@ export class List {
     public readonly id: string,
     public readonly createdAt: string,
     public readonly username: string,
+    public readonly userId: string,
     public title: string,
     public description: string,
     public updatedAt: string,

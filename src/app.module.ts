@@ -1,4 +1,9 @@
-import { Module } from '@nestjs/common';
+import {
+  Module,
+  MiddlewareConsumer,
+  RequestMethod,
+  forwardRef,
+} from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller';
@@ -9,6 +14,8 @@ import { ReviewModule } from '@/infra/modules/review.module';
 import { SocialModule } from '@/infra/modules/socials.module';
 import { LikeModule } from '@/infra/modules/like.module';
 import { ActivityModule } from '@/infra/modules/activity.module';
+import { ActivityMiddleware } from '@/infra/middlewares/activity.middleware';
+import { ListModule } from './infra/modules/list.module';
 
 @Module({
   imports: [
@@ -16,14 +23,25 @@ import { ActivityModule } from '@/infra/modules/activity.module';
       isGlobal: true,
     }),
     MongooseModule.forRoot(process.env.DATABASE_URI),
-    UserModule,
-    AuthModule,
-    ReviewModule,
-    SocialModule,
-    LikeModule,
-    ActivityModule,
+    forwardRef(() => UserModule),
+    forwardRef(() => AuthModule),
+    forwardRef(() => ReviewModule),
+    forwardRef(() => SocialModule),
+    forwardRef(() => LikeModule),
+    forwardRef(() => ActivityModule),
+    forwardRef(() => ListModule),
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(ActivityMiddleware)
+      .forRoutes(
+        { path: 'likes/game/:gameId', method: RequestMethod.POST },
+        { path: 'likes/review/:reviewId', method: RequestMethod.POST },
+        { path: 'likes/list/:listId', method: RequestMethod.POST },
+      );
+  }
+}

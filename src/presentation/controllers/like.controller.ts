@@ -20,6 +20,8 @@ export class LikeController {
     @Req() req: AuthenticatedRequest,
     @Param('reviewId') reviewId: string,
   ) {
+    req.headers['activity-type'] = 'like';
+    req.headers['target-type'] = 'review';
     return this.likeService.likeReview(req.user._id, reviewId);
   }
 
@@ -29,12 +31,19 @@ export class LikeController {
     @Req() req: AuthenticatedRequest,
     @Param('gameId') gameId: string,
   ) {
+    req.headers['activity-type'] = 'like';
+    req.headers['target-type'] = 'game';
     return this.likeService.likeGame(req.user._id, gameId);
   }
 
   @UseGuards(JwtAuthGuard)
-  @Delete(':id')
-  async unlike(@Param('id') id: string) {
-    return this.likeService.unlike(id);
+  @Post('list/:listId')
+  async likeList(
+    @Req() req: AuthenticatedRequest,
+    @Param('listId') listId: string,
+  ) {
+    req.headers['activity-type'] = 'like';
+    req.headers['target-type'] = 'list';
+    return this.likeService.likeList(req.user._id, listId);
   }
 }

@@ -5,12 +5,14 @@ import {
 } from '@nestjs/common';
 import { UserRepository } from '@/infra/repositories/user.repository';
 import { CommentRepository } from '@/infra/repositories/comment.repository';
+import { NotificationGateway } from '@/infra/gateways/notification.gateway';
 
 @Injectable()
 export class SocialService {
   constructor(
     private readonly userRepository: UserRepository,
     private readonly commentRepository: CommentRepository,
+    private readonly notificationGateway: NotificationGateway,
   ) {}
 
   async followUser(
@@ -33,6 +35,12 @@ export class SocialService {
 
     await this.userRepository.update(currentUser);
     await this.userRepository.update(userToFollow);
+
+    this.notificationGateway.sendNotification(userIdToFollow, {
+      type: 'follow',
+      followerId: currentUserId,
+      timestamp: new Date().toISOString(),
+    });
   }
 
   async unfollowUser(

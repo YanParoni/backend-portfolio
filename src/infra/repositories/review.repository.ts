@@ -23,6 +23,7 @@ export class ReviewRepository implements IReviewRepository {
       reviewDocument.likesCount,
       reviewDocument.userName,
       reviewDocument.userProfileImage,
+      reviewDocument.userId,
     );
   }
 
@@ -37,6 +38,7 @@ export class ReviewRepository implements IReviewRepository {
       likesCount: review.likesCount,
       userName: review.userName,
       userProfileImage: review.userProfileImage,
+      userId: review.userId,
     };
   }
 

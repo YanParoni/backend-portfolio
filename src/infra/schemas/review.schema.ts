@@ -31,6 +31,9 @@ export class ReviewSchema {
 
   @Prop({ required: true })
   userProfileImage: string;
+
+  @Prop({ required: true })
+  userId: string;
 }
 
 export const ReviewSchemaSchema = SchemaFactory.createForClass(ReviewSchema);

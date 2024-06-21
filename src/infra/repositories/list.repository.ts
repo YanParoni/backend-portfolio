@@ -16,6 +16,7 @@ export class ListRepository implements IListRepository {
       listDocument._id.toString(),
       listDocument.createdAt,
       listDocument.username,
+      listDocument.userId,
       listDocument.title,
       listDocument.description,
       listDocument.updatedAt,
@@ -29,6 +30,7 @@ export class ListRepository implements IListRepository {
     return {
       createdAt: list.createdAt,
       username: list.username,
+      userId: list.userId,
       title: list.title,
       description: list.description,
       updatedAt: list.updatedAt,

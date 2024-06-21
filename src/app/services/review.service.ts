@@ -7,12 +7,14 @@ import { ReviewRepository } from '@/infra/repositories/review.repository';
 import { UserRepository } from '@/infra/repositories/user.repository';
 import { Review } from '@/domain/entities/review.entity';
 import { CreateReviewDto } from '@/app/dto/create-review.dto';
-
+import { ActivityService } from '@/app/services/activity.service';
+import { Activity } from '@/domain/entities/activity.entity';
 @Injectable()
 export class ReviewService {
   constructor(
     private readonly reviewRepository: ReviewRepository,
     private readonly userRepository: UserRepository,
+    private readonly activityService: ActivityService,
   ) {}
 
   async create(
@@ -35,8 +37,23 @@ export class ReviewService {
       0,
       currentUser.username,
       currentUser.profileImage,
+      currentUserId,
     );
-    return this.reviewRepository.create(review);
+
+    const createdReview = await this.reviewRepository.create(review);
+
+    const activity = new Activity(
+      null,
+      'create',
+      currentUserId,
+      createdReview.id,
+      new Date().toISOString(),
+      'review',
+      { createdReview },
+    );
+    await this.activityService.recordActivity(activity);
+
+    return createdReview;
   }
 
   async findAll(currentUserId: string | null): Promise<Review[]> {

@@ -20,6 +20,9 @@ export class ListSchema {
   @Prop({ required: true })
   username: string;
 
+  @Prop({ required: true })
+  userId: string;
+
   @Prop({ default: 0 })
   likesCount: number;
 

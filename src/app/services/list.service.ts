@@ -4,16 +4,22 @@ import { GameRepository } from '@/infra/repositories/game.repository';
 import { CreateListDto } from '@/app/dto/create-list.dto';
 import { List } from '@/domain/entities/list.entity';
 import { GameService } from './game.service';
-
+import { ActivityService } from '@/app/services/activity.service';
+import { Activity } from '@/domain/entities/activity.entity';
 @Injectable()
 export class ListService {
   constructor(
     private readonly listRepository: ListRepository,
     private readonly gameRepository: GameRepository,
     private readonly gameService: GameService,
+    private readonly activityService: ActivityService,
   ) {}
 
-  async create(createListDto: CreateListDto, username: string): Promise<List> {
+  async create(
+    createListDto: CreateListDto,
+    username: string,
+    userId: string,
+  ): Promise<List> {
     const games = await Promise.all(
       createListDto.games.map(async (gameId) => {
         let game = await this.gameRepository.findById(gameId);
@@ -29,6 +35,7 @@ export class ListService {
       null,
       new Date().toISOString(),
       username,
+      userId,
       createListDto.title,
       createListDto.description,
       new Date().toISOString(),
@@ -36,8 +43,19 @@ export class ListService {
       [],
       games,
     );
+    const createdList = await this.listRepository.create(list);
 
-    return this.listRepository.create(list);
+    const activity = new Activity(
+      null,
+      'create',
+      userId,
+      createdList.id,
+      new Date().toISOString(),
+      'list',
+      {},
+    );
+    await this.activityService.recordActivity(activity);
+    return createdList;
   }
 
   async findByUser(username: string): Promise<List[]> {

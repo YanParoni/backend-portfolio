@@ -1,27 +1,45 @@
 import { Injectable } from '@nestjs/common';
 import { ActivityRepository } from '@/infra/repositories/activity.repository';
-import { ReviewRepository } from '@/infra/repositories/review.repository';
+import { Activity } from '@/domain/entities/activity.entity';
 import { UserRepository } from '@/infra/repositories/user.repository';
+import { ReviewRepository } from '@/infra/repositories/review.repository';
 import { CommentRepository } from '@/infra/repositories/comment.repository';
 import { GameRepository } from '@/infra/repositories/game.repository';
-import { Activity } from '@/domain/entities/activity.entity';
+import { NotificationGateway } from '@/infra/gateways/notification.gateway';
 
 @Injectable()
 export class ActivityService {
   constructor(
     private readonly activityRepository: ActivityRepository,
-    private readonly reviewRepository: ReviewRepository,
     private readonly userRepository: UserRepository,
+    private readonly reviewRepository: ReviewRepository,
     private readonly commentRepository: CommentRepository,
     private readonly gameRepository: GameRepository,
+    private readonly notificationGateway: NotificationGateway,
   ) {}
 
   async recordActivity(activity: Activity): Promise<Activity> {
-    return this.activityRepository.create(activity);
+    const recordedActivity = await this.activityRepository.create(activity);
+
+    const user = await this.userRepository.findById(activity.userId);
+    user.followers.forEach((followerId) => {
+      this.notificationGateway.sendNotification(followerId, recordedActivity);
+    });
+
+    return recordedActivity;
   }
 
-  async getTimeline(userId: string): Promise<Activity[]> {
-    const activities = await this.activityRepository.findByUserId(userId);
+  async getTimeline(userId: string): Promise<any[]> {
+    const user = await this.userRepository.findById(userId);
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    const followingIds = user.following;
+
+    const activities =
+      await this.activityRepository.findByUserIds(followingIds);
 
     return Promise.all(
       activities.map(async (activity) => {

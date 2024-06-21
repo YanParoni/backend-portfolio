@@ -48,4 +48,11 @@ export class ActivityRepository implements IActivityRepository {
     const activityDocuments = await this.activityModel.find({ userId }).exec();
     return activityDocuments.map((doc) => this.toDomain(doc));
   }
+
+  async findByUserIds(userIds: string[]): Promise<Activity[]> {
+    const activityDocuments = await this.activityModel
+      .find({ userId: { $in: userIds } })
+      .exec();
+    return activityDocuments.map((doc) => this.toDomain(doc));
+  }
 }

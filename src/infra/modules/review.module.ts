@@ -8,13 +8,15 @@ import {
 } from '@/infra/schemas/review.schema';
 import { ReviewRepository } from '@/infra/repositories/review.repository';
 import { UserModule } from '@/infra/modules/user.module';
+import { ActivityModule } from '@/infra/modules/activity.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: ReviewSchema.name, schema: ReviewSchemaSchema },
     ]),
-    forwardRef(() => UserModule),
+    UserModule,
+    ActivityModule,
   ],
   controllers: [ReviewController],
   providers: [ReviewService, ReviewRepository],

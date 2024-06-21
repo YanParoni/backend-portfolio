@@ -12,8 +12,4 @@ export class CreateCommentDto {
   @IsString()
   @IsNotEmpty()
   targetType: 'list' | 'review';
-
-  @IsNotEmpty()
-  @IsString()
-  authorId: string;
 }

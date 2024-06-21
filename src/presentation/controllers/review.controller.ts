@@ -29,7 +29,6 @@ export class ReviewController {
   @UseGuards(JwtAuthGuard)
   @Get('authenticated')
   async findAllAuthenticated(@Req() req: AuthenticatedRequest) {
-    console.log(req.user._id);
     return this.reviewService.findAll(req.user._id);
   }
 

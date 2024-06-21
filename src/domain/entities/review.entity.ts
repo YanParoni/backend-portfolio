@@ -10,6 +10,7 @@ export class Review {
     public likesCount: number,
     public readonly userName: string,
     public readonly userProfileImage: string,
+    public readonly userId: string,
   ) {}
 
   addLike(): void {
