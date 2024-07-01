@@ -22,6 +22,8 @@ export class CommentController {
     @Req() req: AuthenticatedRequest,
     @Body() createCommentDto: CreateCommentDto,
   ) {
+    req.headers['activity-type'] = 'create';
+    req.headers['target-type'] = 'comment';
     return this.commentService.create(
       createCommentDto,
       req.user._id,

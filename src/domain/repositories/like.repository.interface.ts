@@ -1,5 +1,4 @@
-import { Like } from '../entities/like.entity';
-
+import { Like } from '@/domain/entities/like.entity';
 export interface ILikeRepository {
   create(like: Like): Promise<Like>;
   delete(id: string): Promise<void>;

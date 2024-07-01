@@ -19,17 +19,6 @@ export class LikeController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('game/:gameId')
-  async likeGame(
-    @Req() req: AuthenticatedRequest,
-    @Param('gameId') gameId: string,
-  ) {
-    req.headers['activity-type'] = 'like';
-    req.headers['target-type'] = 'game';
-    return this.likeService.likeGame(req.user._id, gameId);
-  }
-
-  @UseGuards(JwtAuthGuard)
   @Post('list/:listId')
   async likeList(
     @Req() req: AuthenticatedRequest,

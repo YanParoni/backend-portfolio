@@ -34,7 +34,7 @@ export class ReviewService {
       createReviewDto.reviewDate,
       createReviewDto.content,
       createReviewDto.rating,
-      0,
+      [],
       currentUser.username,
       currentUser.profileImage,
       currentUserId,

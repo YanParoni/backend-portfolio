@@ -20,7 +20,7 @@ export class ListRepository implements IListRepository {
       listDocument.title,
       listDocument.description,
       listDocument.updatedAt,
-      listDocument.likesCount,
+      listDocument.likes,
       listDocument.comments,
       listDocument.games,
     );
@@ -34,7 +34,7 @@ export class ListRepository implements IListRepository {
       title: list.title,
       description: list.description,
       updatedAt: list.updatedAt,
-      likesCount: list.likesCount,
+      likes: list.likes,
       comments: list.comments,
       games: list.games,
     };

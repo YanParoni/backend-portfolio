@@ -16,7 +16,9 @@ import { LikeModule } from '@/infra/modules/like.module';
 import { ActivityModule } from '@/infra/modules/activity.module';
 import { ActivityMiddleware } from '@/infra/middlewares/activity.middleware';
 import { ListModule } from './infra/modules/list.module';
-import { GameInteractionModule } from '@/infra/modules/game-interaction.module';
+import { CommentModule } from './infra/modules/comment.module';
+import { GameInteractionModule } from './infra/modules/game-interaction.module';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -30,6 +32,7 @@ import { GameInteractionModule } from '@/infra/modules/game-interaction.module';
     forwardRef(() => LikeModule),
     forwardRef(() => ActivityModule),
     forwardRef(() => ListModule),
+    forwardRef(() => CommentModule),
     forwardRef(() => GameInteractionModule),
   ],
   controllers: [AppController],
@@ -40,9 +43,11 @@ export class AppModule {
     consumer
       .apply(ActivityMiddleware)
       .forRoutes(
-        { path: 'likes/game/:gameId', method: RequestMethod.POST },
         { path: 'likes/review/:reviewId', method: RequestMethod.POST },
         { path: 'likes/list/:listId', method: RequestMethod.POST },
+        { path: 'comments', method: RequestMethod.POST },
+        { path: 'game-interactions/:gameId', method: RequestMethod.POST },
+        { path: 'reviews', method: RequestMethod.POST },
       );
   }
 }

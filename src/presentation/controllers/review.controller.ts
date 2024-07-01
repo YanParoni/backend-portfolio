@@ -23,6 +23,8 @@ export class ReviewController {
     @Req() req: AuthenticatedRequest,
     @Body() createReviewDto: CreateReviewDto,
   ) {
+    req.headers['activity-type'] = 'create';
+    req.headers['target-type'] = 'review';
     return this.reviewService.create(createReviewDto, req.user._id);
   }
 

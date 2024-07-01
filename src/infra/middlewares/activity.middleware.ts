@@ -13,7 +13,11 @@ export class ActivityMiddleware implements NestMiddleware {
       const activityType = req.headers['activity-type'] as string;
       const targetType = req.headers['target-type'] as string;
       const userId = req.user._id;
-      const targetId = req.params.gameId || req.params.reviewId;
+      const targetId =
+        req.params.gameId ||
+        req.params.reviewId ||
+        req.params.listId ||
+        req.params.commentId;
 
       if (activityType && targetType && userId && targetId) {
         const details = req.body.details || {};

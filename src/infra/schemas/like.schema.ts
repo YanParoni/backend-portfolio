@@ -12,7 +12,7 @@ export class LikeSchema {
   targetId: string;
 
   @Prop({ required: true })
-  targetType: 'game' | 'review' | 'list';
+  targetType: 'review' | 'list';
 }
 
 export const LikeSchemaSchema = SchemaFactory.createForClass(LikeSchema);

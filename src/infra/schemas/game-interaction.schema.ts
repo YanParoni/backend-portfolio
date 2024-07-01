@@ -11,10 +11,10 @@ export class GameInteractionSchema {
   @Prop({ required: true })
   gameId: string;
 
-  @Prop({ default: false })
+  @Prop({ required: true })
   liked: boolean;
 
-  @Prop({ default: false })
+  @Prop({ required: true })
   played: boolean;
 }
 

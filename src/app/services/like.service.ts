@@ -1,21 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { LikeRepository } from '@/infra/repositories/like.repository';
 import { ReviewRepository } from '@/infra/repositories/review.repository';
-import { GameService } from '@/app/services/game.service';
 import { UserRepository } from '@/infra/repositories/user.repository';
 import { ListRepository } from '@/infra/repositories/list.repository';
-import { NotificationGateway } from '@/infra/gateways/notification.gateway';
+import { ActivityService } from '@/app/services/activity.service';
 import { Like } from '@/domain/entities/like.entity';
+import { Activity } from '@/domain/entities/activity.entity';
 
 @Injectable()
 export class LikeService {
   constructor(
     private readonly likeRepository: LikeRepository,
     private readonly reviewRepository: ReviewRepository,
-    private readonly gameService: GameService,
     private readonly userRepository: UserRepository,
     private readonly listRepository: ListRepository,
-    private readonly notificationGateway: NotificationGateway,
+    private readonly activityService: ActivityService,
   ) {}
 
   async likeReview(userId: string, reviewId: string): Promise<Like | void> {
@@ -36,37 +35,19 @@ export class LikeService {
     await this.userRepository.update(user);
 
     const review = await this.reviewRepository.findById(reviewId);
-    review.addLike();
+    review.addLike(createdLike.id);
     await this.reviewRepository.update(review);
 
-    this.notificationGateway.sendNotification(review.userId, {
-      type: 'like',
-      targetType: 'review',
-      targetId: reviewId,
+    const activity = new Activity(
+      null,
+      'like',
       userId,
-      timestamp: new Date().toISOString(),
-    });
-
-    return createdLike;
-  }
-
-  async likeGame(userId: string, gameId: string): Promise<Like | void> {
-    const existingLike = await this.likeRepository.findByUserIdAndTargetId(
-      userId,
-      gameId,
+      reviewId,
+      new Date().toISOString(),
+      'review',
+      {},
     );
-    if (existingLike) {
-      await this.unlike(existingLike.id, userId, 'game', gameId);
-      return;
-    }
-
-    const game = await this.gameService.findOrCreateGame(gameId);
-    const like = new Like(null, userId, game.gameId, 'game');
-    const createdLike = await this.likeRepository.create(like);
-
-    const user = await this.userRepository.findById(userId);
-    user.addLike(createdLike.id);
-    await this.userRepository.update(user);
+    await this.activityService.recordActivity(activity);
 
     return createdLike;
   }
@@ -89,22 +70,27 @@ export class LikeService {
     await this.userRepository.update(user);
 
     const list = await this.listRepository.findById(listId);
-    list.likesCount += 1;
+    list.addLike(createdLike.id);
     await this.listRepository.update(list);
-    this.notificationGateway.sendNotification(list.userId, {
-      type: 'like',
-      targetType: 'list',
-      targetId: listId,
+
+    const activity = new Activity(
+      null,
+      'like',
       userId,
-      timestamp: new Date().toISOString(),
-    });
+      listId,
+      new Date().toISOString(),
+      'list',
+      {},
+    );
+    await this.activityService.recordActivity(activity);
+
     return createdLike;
   }
 
   async unlike(
     likeId: string,
     userId: string,
-    targetType: 'review' | 'game' | 'list',
+    targetType: 'review' | 'list',
     targetId: string,
   ): Promise<void> {
     await this.likeRepository.delete(likeId);
@@ -115,11 +101,11 @@ export class LikeService {
 
     if (targetType === 'review') {
       const review = await this.reviewRepository.findById(targetId);
-      review.removeLike();
+      review.removeLike(likeId);
       await this.reviewRepository.update(review);
     } else if (targetType === 'list') {
       const list = await this.listRepository.findById(targetId);
-      list.likesCount -= 1;
+      list.removeLike(likeId);
       await this.listRepository.update(list);
     }
   }

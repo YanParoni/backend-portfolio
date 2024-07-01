@@ -3,6 +3,6 @@ export class Like {
     public readonly id: string,
     public readonly userId: string,
     public readonly targetId: string,
-    public readonly targetType: 'game' | 'review' | 'list',
+    public readonly targetType: 'review' | 'list',
   ) {}
 }

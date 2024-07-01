@@ -59,16 +59,6 @@ export class User {
     this.blockedUsers = this.blockedUsers.filter((id) => id !== userId);
   }
 
-  addFavorite(gameId: string): void {
-    if (!this.favorites.includes(gameId)) {
-      this.favorites.push(gameId);
-    }
-  }
-
-  removeFavorite(gameId: string): void {
-    this.favorites = this.favorites.filter((id) => id !== gameId);
-  }
-
   addLike(reviewId: string): void {
     if (!this.likes.includes(reviewId)) {
       this.likes.push(reviewId);

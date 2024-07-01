@@ -23,8 +23,8 @@ export class ListSchema {
   @Prop({ required: true })
   userId: string;
 
-  @Prop({ default: 0 })
-  likesCount: number;
+  @Prop({ required: true, type: [String] })
+  likes: string[];
 
   @Prop({ required: true, type: [String] })
   comments: string[];

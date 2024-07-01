@@ -7,7 +7,7 @@ export class List {
     public title: string,
     public description: string,
     public updatedAt: string,
-    public likesCount: number,
+    public likes: string[],
     public comments: string[],
     public games: string[],
   ) {}
@@ -34,13 +34,13 @@ export class List {
     this.comments = this.comments.filter((id) => id !== commentId);
   }
 
-  addLike(): void {
-    this.likesCount++;
+  addLike(likeId: string): void {
+    if (!this.likes.includes(likeId)) {
+      this.likes.push(likeId);
+    }
   }
 
-  removeLike(): void {
-    if (this.likesCount > 0) {
-      this.likesCount--;
-    }
+  removeLike(likeId: string): void {
+    this.likes = this.likes.filter((id) => id !== likeId);
   }
 }

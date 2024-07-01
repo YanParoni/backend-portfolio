@@ -39,7 +39,7 @@ export class ListService {
       createListDto.title,
       createListDto.description,
       new Date().toISOString(),
-      0,
+      [],
       [],
       games,
     );

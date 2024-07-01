@@ -7,19 +7,19 @@ export class Review {
     public readonly reviewDate: string,
     public readonly content: string,
     public readonly rating: number,
-    public likesCount: number,
+    public likes: string[],
     public readonly userName: string,
     public readonly userProfileImage: string,
     public readonly userId: string,
   ) {}
 
-  addLike(): void {
-    this.likesCount++;
+  addLike(likeId: string): void {
+    if (!this.likes.includes(likeId)) {
+      this.likes.push(likeId);
+    }
   }
 
-  removeLike(): void {
-    if (this.likesCount > 0) {
-      this.likesCount--;
-    }
+  removeLike(likeId: string): void {
+    this.likes = this.likes.filter((id) => id !== likeId);
   }
 }

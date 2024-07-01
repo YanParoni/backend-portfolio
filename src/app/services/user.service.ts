@@ -95,18 +95,4 @@ export class UserService {
   ): Promise<void> {
     await this.userRepository.updatePassword(userId, hashedPassword);
   }
-
-  async addGameInteraction(
-    userId: string,
-    interactionId: string,
-  ): Promise<void> {
-    return this.userRepository.addGameInteraction(userId, interactionId);
-  }
-
-  async removeGameInteraction(
-    userId: string,
-    interactionId: string,
-  ): Promise<void> {
-    return this.userRepository.removeGameInteraction(userId, interactionId);
-  }
 }

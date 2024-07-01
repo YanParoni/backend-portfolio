@@ -23,8 +23,8 @@ export class ReviewSchema {
   @Prop({ required: true })
   rating: number;
 
-  @Prop({ default: 0 })
-  likesCount: number;
+  @Prop({ required: true, type: [String] })
+  likes: string[];
 
   @Prop({ required: true })
   userName: string;
