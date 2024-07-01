@@ -37,4 +37,22 @@ export class UserController {
   getProfile(@Request() req: AuthenticatedRequest, @Param('id') id: string) {
     return this.userService.findById(id);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('game-interaction')
+  async addGameInteraction(
+    @Request() req: AuthenticatedRequest,
+    @Body('interactionId') interactionId: string,
+  ) {
+    return this.userService.addGameInteraction(req.user._id, interactionId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('remove-game-interaction')
+  async removeGameInteraction(
+    @Request() req: AuthenticatedRequest,
+    @Body('interactionId') interactionId: string,
+  ) {
+    return this.userService.removeGameInteraction(req.user._id, interactionId);
+  }
 }

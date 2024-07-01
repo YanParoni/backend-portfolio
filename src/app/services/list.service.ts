@@ -91,7 +91,6 @@ export class ListService {
     if (!list) {
       throw new NotFoundException('List not found');
     }
-    console.log(gameIds);
     const games = await Promise.all(
       gameIds.map(async (gameId) => {
         let game = await this.gameRepository.findById(gameId);

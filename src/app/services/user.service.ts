@@ -1,5 +1,3 @@
-// src/app/services/user.service.ts
-
 import {
   Injectable,
   NotFoundException,
@@ -42,7 +40,6 @@ export class UserService {
 
   async createOAuthUser(profile: any): Promise<User> {
     const email = profile.emails?.[0]?.value;
-    console.log(profile, 'profile no service oauth');
     const username =
       profile.displayName ||
       profile.name?.givenName ||
@@ -57,7 +54,7 @@ export class UserService {
       username,
       email,
       '',
-      '',
+      profile.photos[0].value,
       '',
       false,
       [],
@@ -97,5 +94,19 @@ export class UserService {
     hashedPassword: string,
   ): Promise<void> {
     await this.userRepository.updatePassword(userId, hashedPassword);
+  }
+
+  async addGameInteraction(
+    userId: string,
+    interactionId: string,
+  ): Promise<void> {
+    return this.userRepository.addGameInteraction(userId, interactionId);
+  }
+
+  async removeGameInteraction(
+    userId: string,
+    interactionId: string,
+  ): Promise<void> {
+    return this.userRepository.removeGameInteraction(userId, interactionId);
   }
 }

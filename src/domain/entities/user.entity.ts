@@ -10,10 +10,22 @@ export class User {
     public followers: string[],
     public following: string[],
     public blockedUsers: string[],
-    public favorites: string[],
     public reviews: string[],
     public likes: string[],
+    public gameInteractions: string[],
   ) {}
+
+  addGameInteraction(interactionId: string): void {
+    if (!this.gameInteractions.includes(interactionId)) {
+      this.gameInteractions.push(interactionId);
+    }
+  }
+
+  removeGameInteraction(interactionId: string): void {
+    this.gameInteractions = this.gameInteractions.filter(
+      (id) => id !== interactionId,
+    );
+  }
 
   addFollower(followerId: string): void {
     if (!this.followers.includes(followerId)) {

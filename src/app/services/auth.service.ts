@@ -51,7 +51,6 @@ export class AuthService {
     }
 
     let user = await this.userService.findByEmail(email);
-
     if (!user) {
       user = await this.userService.createOAuthUser(profile);
     }

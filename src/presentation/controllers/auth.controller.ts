@@ -1,10 +1,19 @@
-import { Controller, Get, Post, Req, Body, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Req,
+  Body,
+  UseGuards,
+  Res,
+} from '@nestjs/common';
 import { AuthService } from '@/app/services/auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { JwtAuthGuard } from '@/infra/guards/jwt-auth.guard';
 import { ResetPasswordDto } from '@/app/dto/reset-password.dto';
 import { LoginUserDto } from '@/app/dto/login-user.dto';
 import { AuthenticatedRequest } from '@/presentation/interfaces/authenticated-request.interface';
+import { Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -18,8 +27,9 @@ export class AuthController {
 
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
-  async googleAuthRedirect(@Req() req) {
+  async googleAuthRedirect(@Req() req, @Res() res: Response) {
     const jwt = req.user.jwt;
+    res.redirect(`http://localhost:3001/auth/success?token=${jwt}`);
     return { jwt };
   }
 

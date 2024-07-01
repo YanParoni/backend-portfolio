@@ -7,4 +7,6 @@ export interface IUserRepository {
   findByEmail(email: string): Promise<User | null>;
   update(user: User): Promise<User>;
   updatePassword(userId: string, hashedPassword: string): Promise<void>;
+  addGameInteraction(userId: string, interactionId: string): Promise<void>;
+  removeGameInteraction(userId: string, interactionId: string): Promise<void>;
 }

@@ -1,3 +1,4 @@
+// src/infra/schemas/user.schema.ts
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
@@ -32,14 +33,14 @@ export class UserSchema {
   @Prop({ ref: 'User' })
   blockedUsers: string[];
 
-  @Prop({ ref: 'Game' })
-  favorites: string[];
-
   @Prop({ ref: 'Review' })
   reviews: string[];
 
   @Prop({ ref: 'Like' })
   likes: string[];
+
+  @Prop({ ref: 'GameInteraction' })
+  gameInteractions: string[];
 }
 
 export const UserSchemaSchema = SchemaFactory.createForClass(UserSchema);

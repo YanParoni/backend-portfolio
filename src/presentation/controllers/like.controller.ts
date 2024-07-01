@@ -1,11 +1,4 @@
-import {
-  Controller,
-  Post,
-  Delete,
-  Param,
-  UseGuards,
-  Req,
-} from '@nestjs/common';
+import { Controller, Post, Param, UseGuards, Req } from '@nestjs/common';
 import { LikeService } from '@/app/services/like.service';
 import { JwtAuthGuard } from '@/infra/guards/jwt-auth.guard';
 import { AuthenticatedRequest } from '@/presentation/interfaces/authenticated-request.interface';

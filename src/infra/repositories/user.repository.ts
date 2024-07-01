@@ -1,3 +1,4 @@
+// src/infra/repositories/user.repository.ts
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -23,9 +24,9 @@ export class UserRepository implements IUserRepository {
       userDocument.followers,
       userDocument.following,
       userDocument.blockedUsers,
-      userDocument.favorites,
       userDocument.reviews,
       userDocument.likes,
+      userDocument.gameInteractions,
     );
   }
 
@@ -40,9 +41,9 @@ export class UserRepository implements IUserRepository {
       followers: user.followers,
       following: user.following,
       blockedUsers: user.blockedUsers,
-      favorites: user.favorites,
       reviews: user.reviews,
       likes: user.likes,
+      gameInteractions: user.gameInteractions,
     };
   }
 
@@ -80,16 +81,27 @@ export class UserRepository implements IUserRepository {
       .exec();
   }
 
-  async createOAuthUser(profile: any): Promise<UserEntity> {
-    const createdUser = new this.userModel({
-      username: profile.firstName,
-      email: profile.email,
-      password: null,
-      favorites: [],
-      reviews: [],
-      likes: [],
-    });
-    const savedUser = await createdUser.save();
-    return this.toDomain(savedUser);
+  async addGameInteraction(
+    userId: string,
+    interactionId: string,
+  ): Promise<void> {
+    await this.userModel
+      .updateOne(
+        { _id: userId },
+        { $push: { gameInteractions: interactionId } },
+      )
+      .exec();
+  }
+
+  async removeGameInteraction(
+    userId: string,
+    interactionId: string,
+  ): Promise<void> {
+    await this.userModel
+      .updateOne(
+        { _id: userId },
+        { $pull: { gameInteractions: interactionId } },
+      )
+      .exec();
   }
 }
