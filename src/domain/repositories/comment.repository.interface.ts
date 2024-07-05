@@ -1,5 +1,3 @@
-// src/domain/repositories/comment.repository.interface.ts
-
 import { Comment } from '@/domain/entities/comment.entity';
 
 export interface ICommentRepository {

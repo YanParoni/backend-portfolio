@@ -32,6 +32,24 @@ export class UserController {
     return this.userService.updateProfileImage(req.user._id, base64Image);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Patch('bio')
+  async updateBio(
+    @Request() req: AuthenticatedRequest,
+    @Body('newBio') newBio: string,
+  ) {
+    return this.userService.updateBio(req.user._id, newBio);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('at')
+  async updateAt(
+    @Request() req: AuthenticatedRequest,
+    @Body('newAt') newAt: string,
+  ) {
+    return this.userService.updateAt(req.user._id, newAt);
+  }
+
   @UseGuards(JwtAuthGuard, BlockedGuard)
   @Get('profile/:id')
   getProfile(@Request() req: AuthenticatedRequest, @Param('id') id: string) {

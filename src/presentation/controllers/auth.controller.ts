@@ -6,11 +6,11 @@ import {
   Body,
   UseGuards,
   Res,
+
 } from '@nestjs/common';
 import { AuthService } from '@/app/services/auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { JwtAuthGuard } from '@/infra/guards/jwt-auth.guard';
-import { ResetPasswordDto } from '@/app/dto/reset-password.dto';
 import { LoginUserDto } from '@/app/dto/login-user.dto';
 import { AuthenticatedRequest } from '@/presentation/interfaces/authenticated-request.interface';
 import { Response } from 'express';
@@ -37,13 +37,6 @@ export class AuthController {
   @Get('profile')
   getProfile(@Req() req: AuthenticatedRequest) {
     return req.user;
-  }
-
-  @Post('reset-password')
-  async resetPassword(
-    @Body() resetPasswordDto: ResetPasswordDto,
-  ): Promise<void> {
-    await this.authService.resetPassword(resetPasswordDto);
   }
 
   @Post('login')

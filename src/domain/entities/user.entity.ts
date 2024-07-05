@@ -2,6 +2,7 @@ export class User {
   constructor(
     public readonly id: string,
     public readonly username: string,
+    public at: string,
     public readonly email: string,
     public password: string,
     public profileImage: string,
@@ -13,8 +14,9 @@ export class User {
     public reviews: string[],
     public likes: string[],
     public gameInteractions: string[],
-  ) {}
-
+  ) {
+    this.at = username;
+  }
   addGameInteraction(interactionId: string): void {
     if (!this.gameInteractions.includes(interactionId)) {
       this.gameInteractions.push(interactionId);
@@ -75,6 +77,10 @@ export class User {
 
   updateBio(newBio: string): void {
     this.bio = newBio;
+  }
+
+  updateAt(newAt: string): void {
+    this.at = newAt;
   }
 
   isBlocked(userId: string): boolean {

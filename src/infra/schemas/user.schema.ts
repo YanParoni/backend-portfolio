@@ -1,4 +1,3 @@
-// src/infra/schemas/user.schema.ts
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
@@ -9,6 +8,8 @@ export class UserSchema {
   @Prop({ required: true, unique: true })
   username: string;
 
+  @Prop({ required: true, unique: true })
+  at: string;
   @Prop({ required: true, unique: true })
   email: string;
 

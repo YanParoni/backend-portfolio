@@ -1,4 +1,3 @@
-// src/infra/repositories/user.repository.ts
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -16,6 +15,7 @@ export class UserRepository implements IUserRepository {
     return new UserEntity(
       userDocument._id.toString(),
       userDocument.username,
+      userDocument.at,
       userDocument.email,
       userDocument.password,
       userDocument.profileImage,
@@ -33,6 +33,7 @@ export class UserRepository implements IUserRepository {
   private toSchema(user: UserEntity): Partial<UserDocument> {
     return {
       username: user.username,
+      at: user.at,
       email: user.email,
       password: user.password,
       profileImage: user.profileImage,
@@ -68,6 +69,11 @@ export class UserRepository implements IUserRepository {
     return userDocument ? this.toDomain(userDocument) : null;
   }
 
+  async findByUsername(username: string): Promise<UserEntity | null> {
+    const userDocument = await this.userModel.findOne({ username }).exec();
+    return userDocument ? this.toDomain(userDocument) : null;
+  }
+
   async update(user: UserEntity): Promise<UserEntity> {
     const updatedUser = await this.userModel
       .findByIdAndUpdate(user.id, this.toSchema(user), { new: true })
@@ -80,7 +86,6 @@ export class UserRepository implements IUserRepository {
       .updateOne({ _id: userId }, { password: hashedPassword })
       .exec();
   }
-
   async addGameInteraction(
     userId: string,
     interactionId: string,

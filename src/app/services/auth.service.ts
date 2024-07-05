@@ -1,23 +1,23 @@
 import {
   Injectable,
-  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { UserService } from '@/app/services/user.service';
+import { UserRepository } from '@/infra/repositories/user.repository';
 import { LoginUserDto } from '@/app/dto/login-user.dto';
-import { ResetPasswordDto } from '@/app/dto/reset-password.dto';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userService: UserService,
+    private readonly userRepository: UserRepository,
     private readonly jwtService: JwtService,
   ) {}
 
-  async validateUser(email: string, pass: string): Promise<any> {
-    const user = await this.userService.findByEmail(email);
+  async validateUser(username: string, pass: string): Promise<any> {
+    const user = await this.userService.findByUsername(username);
     if (user && (await bcrypt.compare(pass, user.password))) {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { password, ...result } = user;
@@ -27,7 +27,7 @@ export class AuthService {
   }
 
   async login(loginUserDto: LoginUserDto): Promise<{ accessToken: string }> {
-    const user = await this.userService.findByEmail(loginUserDto.email);
+    const user = await this.userService.findByEmail(loginUserDto.username);
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }
@@ -57,18 +57,5 @@ export class AuthService {
 
     const payload = { username: user.username, sub: user.id };
     return this.jwtService.sign(payload);
-  }
-
-  async resetPassword(resetPasswordDto: ResetPasswordDto): Promise<void> {
-    const user = await this.userService.findByEmail(resetPasswordDto.email);
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-    const salt = await bcrypt.genSalt();
-    const hashedPassword = await bcrypt.hash(
-      resetPasswordDto.newPassword,
-      salt,
-    );
-    await this.userService.updateUserPassword(user.id, hashedPassword);
   }
 }
