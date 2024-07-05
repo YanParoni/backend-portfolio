@@ -1,5 +1,6 @@
 import {
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -7,6 +8,7 @@ import * as bcrypt from 'bcrypt';
 import { UserService } from '@/app/services/user.service';
 import { UserRepository } from '@/infra/repositories/user.repository';
 import { LoginUserDto } from '@/app/dto/login-user.dto';
+import { EmailService } from '@/app/services/email.service';
 
 @Injectable()
 export class AuthService {
@@ -14,6 +16,7 @@ export class AuthService {
     private readonly userService: UserService,
     private readonly userRepository: UserRepository,
     private readonly jwtService: JwtService,
+    private readonly emailService: EmailService,
   ) {}
 
   async validateUser(username: string, pass: string): Promise<any> {
@@ -27,7 +30,7 @@ export class AuthService {
   }
 
   async login(loginUserDto: LoginUserDto): Promise<{ accessToken: string }> {
-    const user = await this.userService.findByEmail(loginUserDto.username);
+    const user = await this.userService.findByUsername(loginUserDto.username);
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }
@@ -42,6 +45,34 @@ export class AuthService {
     return {
       accessToken: this.jwtService.sign(payload),
     };
+  }
+
+  async requestPasswordReset(email: string): Promise<void> {
+    const user = await this.userService.findByEmail(email);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    const token = this.jwtService.sign(
+      { userId: user.id },
+      { expiresIn: '1h' },
+    );
+    const resetLink = `http://localhost:3000/reset-password/${token}`;
+    await this.emailService.sendMail(
+      email,
+      'Password Reset Request',
+      `Please click the link to reset your password: ${resetLink}`,
+    );
+  }
+
+  async resetPassword(token: string, newPassword: string): Promise<void> {
+    const decoded = this.jwtService.verify(token);
+    const userId = decoded.userId;
+    const user = await this.userService.findById(userId);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await this.userRepository.updatePassword(userId, hashedPassword);
   }
 
   async validateOAuthLogin(profile: any): Promise<string> {

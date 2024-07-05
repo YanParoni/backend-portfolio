@@ -18,7 +18,7 @@ import { ActivityMiddleware } from '@/infra/middlewares/activity.middleware';
 import { ListModule } from './infra/modules/list.module';
 import { CommentModule } from './infra/modules/comment.module';
 import { GameInteractionModule } from './infra/modules/game-interaction.module';
-
+import { EmailModule } from './infra/modules/email.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -34,6 +34,7 @@ import { GameInteractionModule } from './infra/modules/game-interaction.module';
     forwardRef(() => ListModule),
     forwardRef(() => CommentModule),
     forwardRef(() => GameInteractionModule),
+    forwardRef(() => EmailModule),
   ],
   controllers: [AppController],
   providers: [AppService],

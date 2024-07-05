@@ -7,10 +7,11 @@ import { JwtStrategy } from '@/infra/strategies/jwt.strategy';
 import { GoogleStrategy } from '@/infra/strategies/google.strategy';
 import { UserModule } from '@/infra/modules/user.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-
+import { EmailModule } from './email.module';
 @Module({
   imports: [
     forwardRef(() => UserModule),
+    forwardRef(() => EmailModule),
     PassportModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],

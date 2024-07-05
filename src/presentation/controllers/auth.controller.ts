@@ -2,11 +2,10 @@ import {
   Controller,
   Get,
   Post,
-  Req,
   Body,
+  Req,
   UseGuards,
   Res,
-
 } from '@nestjs/common';
 import { AuthService } from '@/app/services/auth.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -44,5 +43,20 @@ export class AuthController {
     @Body() loginUserDto: LoginUserDto,
   ): Promise<{ accessToken: string }> {
     return this.authService.login(loginUserDto);
+  }
+
+  @Post('reset-password-request')
+  async requestPasswordReset(@Body('email') email: string) {
+    await this.authService.requestPasswordReset(email);
+    return { message: 'Password reset email sent successfully' };
+  }
+
+  @Post('reset-password')
+  async resetPassword(
+    @Body('token') token: string,
+    @Body('newPassword') newPassword: string,
+  ) {
+    await this.authService.resetPassword(token, newPassword);
+    return { message: 'Password reset successfully' };
   }
 }
