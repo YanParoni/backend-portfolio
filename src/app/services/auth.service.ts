@@ -44,7 +44,7 @@ export class AuthService {
     const payload = {
       username: user.username,
       sub: user.id,
-      photo: user?.profileImage || '',
+      profileImage: user?.profileImage || '',
     };
     return {
       accessToken: this.jwtService.sign(payload),
@@ -89,8 +89,11 @@ export class AuthService {
     if (!user) {
       user = await this.userService.createOAuthUser(profile);
     }
-
-    const payload = { username: user.username, sub: user.id };
+    const payload = {
+      username: user.username,
+      sub: user.id,
+      profileImage: user.profileImage,
+    };
     return this.jwtService.sign(payload);
   }
 }
