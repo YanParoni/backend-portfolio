@@ -51,7 +51,7 @@ export class UserController {
   }
 
   @UseGuards(JwtAuthGuard, BlockedGuard)
-  @Get('profile/:id')
+  @Get('profile')
   getProfile(@Request() req: AuthenticatedRequest, @Param('id') id: string) {
     return this.userService.findById(id);
   }
