@@ -82,7 +82,6 @@ export class GameInteractionRepository implements IGameInteractionRepository {
   }
 
   async findByUserId(userId: string): Promise<GameInteraction[]> {
-    console.log(userId, 'repo');
     const interactionDocuments = await this.gameInteractionModel
       .find({ userId })
       .exec();
