@@ -106,4 +106,11 @@ export class UserService {
     user.updateAt(newAt);
     return this.userRepository.update(user);
   }
+
+  async addGameInteraction(
+    userId: string,
+    interactionId: string,
+  ): Promise<void> {
+    await this.userRepository.addGameInteraction(userId, interactionId);
+  }
 }

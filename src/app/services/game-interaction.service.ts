@@ -4,6 +4,7 @@ import { GameInteraction } from '@/domain/entities/game-interaction.entity';
 import { GameService } from '@/app/services/game.service';
 import { ActivityService } from '@/app/services/activity.service';
 import { Activity } from '@/domain/entities/activity.entity';
+import { UserService } from '@/app/services/user.service';
 
 @Injectable()
 export class GameInteractionService {
@@ -11,6 +12,7 @@ export class GameInteractionService {
     private readonly interactionRepository: GameInteractionRepository,
     private readonly gameService: GameService,
     private readonly activityService: ActivityService,
+    private readonly userService: UserService,
   ) {}
 
   async createInteraction(
@@ -52,6 +54,8 @@ export class GameInteractionService {
     );
     const createdInteraction =
       await this.interactionRepository.create(interaction);
+
+    await this.userService.addGameInteraction(userId, createdInteraction.id);
 
     const activity = new Activity(
       null,

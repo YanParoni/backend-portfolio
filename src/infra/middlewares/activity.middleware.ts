@@ -12,6 +12,7 @@ export class ActivityMiddleware implements NestMiddleware {
     res.on('finish', async () => {
       const activityType = req.headers['activity-type'] as string;
       const targetType = req.headers['target-type'] as string;
+      console.log(activityType, targetType);
       const userId = req.user._id;
       const targetId =
         req.params.gameId ||

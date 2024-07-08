@@ -57,10 +57,10 @@ export class AuthService {
       throw new NotFoundException('User not found');
     }
     const token = this.jwtService.sign(
-      { userId: user.id },
+      { userId: user.id, name: user.username },
       { expiresIn: '1h' },
     );
-    const resetLink = `http://localhost:3000/reset-password/${token}`;
+    const resetLink = `http://localhost:3001/user/reset-password?token=${token}`;
     await this.emailService.sendMail(
       email,
       'Password Reset Request',
