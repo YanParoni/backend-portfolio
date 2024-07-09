@@ -6,7 +6,6 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { UserService } from '@/app/services/user.service';
-import { UserRepository } from '@/infra/repositories/user.repository';
 import { LoginUserDto } from '@/app/dto/login-user.dto';
 import { EmailService } from '@/app/services/email.service';
 
@@ -14,14 +13,13 @@ import { EmailService } from '@/app/services/email.service';
 export class AuthService {
   constructor(
     private readonly userService: UserService,
-    private readonly userRepository: UserRepository,
     private readonly jwtService: JwtService,
     private readonly emailService: EmailService,
   ) {}
 
   async validateUser(username: string, pass: string): Promise<any> {
     const user = await this.userService.findByUsername(username);
-    if (user && (await bcrypt.compare(pass, user.password))) {
+    if (user && !user.oauth && (await bcrypt.compare(pass, user.password))) {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { password, ...result } = user;
       return result;
@@ -31,7 +29,7 @@ export class AuthService {
 
   async login(loginUserDto: LoginUserDto): Promise<{ accessToken: string }> {
     const user = await this.userService.findByUsername(loginUserDto.username);
-    if (!user) {
+    if (!user || user.oauth) {
       throw new UnauthorizedException('Invalid credentials');
     }
     const isPasswordMatching = await bcrypt.compare(
@@ -76,7 +74,7 @@ export class AuthService {
       throw new NotFoundException('User not found');
     }
     const hashedPassword = await bcrypt.hash(newPassword, 10);
-    await this.userRepository.updatePassword(userId, hashedPassword);
+    await this.userService.updatePassword(userId, hashedPassword);
   }
 
   async validateOAuthLogin(profile: any): Promise<string> {
@@ -95,5 +93,23 @@ export class AuthService {
       profileImage: user.profileImage,
     };
     return this.jwtService.sign(payload);
+  }
+
+  async findUserByEmail(email: string) {
+    const user = await this.userService.findByEmail(email);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return user;
+  }
+
+  async getUserFromToken(token: string) {
+    const decoded = this.jwtService.verify(token);
+    const userId = decoded.userId;
+    const user = await this.userService.findById(userId);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return user;
   }
 }

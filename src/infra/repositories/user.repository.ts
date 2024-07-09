@@ -27,6 +27,7 @@ export class UserRepository implements IUserRepository {
       userDocument.reviews,
       userDocument.likes,
       userDocument.gameInteractions,
+      false,
     );
   }
 

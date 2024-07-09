@@ -2,7 +2,6 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
 export type UserDocument = UserSchema & Document;
-
 @Schema()
 export class UserSchema {
   @Prop({ required: true, unique: true })
@@ -10,6 +9,7 @@ export class UserSchema {
 
   @Prop({ required: true, unique: true })
   at: string;
+
   @Prop({ required: true, unique: true })
   email: string;
 
@@ -42,6 +42,9 @@ export class UserSchema {
 
   @Prop({ ref: 'GameInteraction' })
   gameInteractions: string[];
+
+  @Prop({ default: false })
+  oauth: boolean;
 }
 
 export const UserSchemaSchema = SchemaFactory.createForClass(UserSchema);

@@ -35,6 +35,7 @@ export class UserService {
       [],
       [],
       [],
+      false,
     );
     return this.userRepository.create(user);
   }
@@ -65,6 +66,7 @@ export class UserService {
       [],
       [],
       [],
+      true,
     );
     return this.userRepository.create(user);
   }
@@ -112,5 +114,12 @@ export class UserService {
     interactionId: string,
   ): Promise<void> {
     await this.userRepository.addGameInteraction(userId, interactionId);
+  }
+
+  async updatePassword(userId: string, newPassword: string): Promise<void> {
+    const user = await this.findById(userId);
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+    await this.userRepository.update(user);
   }
 }

@@ -62,6 +62,13 @@ export class AuthController {
 
   @Post('reset-password-request')
   async requestPasswordReset(@Body('email') email: string) {
+    const user = await this.authService.findUserByEmail(email);
+    if (user.isOAuth) {
+      return {
+        message:
+          'OAuth users cannot reset their password through this service.',
+      };
+    }
     await this.authService.requestPasswordReset(email);
     return { message: 'Password reset email sent successfully' };
   }
@@ -71,6 +78,13 @@ export class AuthController {
     @Body('token') token: string,
     @Body('newPassword') newPassword: string,
   ) {
+    const user = await this.authService.getUserFromToken(token);
+    if (user.isOAuth) {
+      return {
+        message:
+          'OAuth users cannot reset their password through this service.',
+      };
+    }
     await this.authService.resetPassword(token, newPassword);
     return { message: 'Password reset successfully' };
   }

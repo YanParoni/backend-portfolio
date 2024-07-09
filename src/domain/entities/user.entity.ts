@@ -14,6 +14,7 @@ export class User {
     public reviews: string[],
     public likes: string[],
     public gameInteractions: string[],
+    public oauth: boolean,
   ) {
     this.at = username;
   }
