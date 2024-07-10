@@ -5,12 +5,16 @@ import { Injectable } from '@nestjs/common';
 export class EmailService {
   constructor(private readonly mailerService: MailerService) {}
 
-  async sendMail(to: string, subject: string, text: string) {
+  async sendMail(to: string, username: string, resetLink: string) {
     await this.mailerService.sendMail({
       to,
       from: 'nextplayportfolio@gmail.com',
-      subject,
-      text,
+      subject: 'Password Reset Request',
+      template: './password-reset',
+      context: {
+        username,
+        resetLink,
+      },
     });
   }
 }

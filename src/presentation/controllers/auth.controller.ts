@@ -63,7 +63,7 @@ export class AuthController {
   @Post('reset-password-request')
   async requestPasswordReset(@Body('email') email: string) {
     const user = await this.authService.findUserByEmail(email);
-    if (user.isOAuth) {
+    if (user.oauth) {
       return {
         message:
           'OAuth users cannot reset their password through this service.',
@@ -79,7 +79,7 @@ export class AuthController {
     @Body('newPassword') newPassword: string,
   ) {
     const user = await this.authService.getUserFromToken(token);
-    if (user.isOAuth) {
+    if (user.oauth) {
       return {
         message:
           'OAuth users cannot reset their password through this service.',
