@@ -40,37 +40,6 @@ export class UserService {
     return this.userRepository.create(user);
   }
 
-  async createOAuthUser(profile: any): Promise<User> {
-    const email = profile.emails?.[0]?.value;
-    const username =
-      profile.displayName ||
-      profile.name?.givenName ||
-      profile.emails?.[0]?.value;
-
-    if (!email || !username) {
-      throw new Error('Email or username not found in Google profile');
-    }
-
-    const user = new User(
-      null,
-      username,
-      username,
-      email,
-      '',
-      profile.photos[0].value,
-      '',
-      false,
-      [],
-      [],
-      [],
-      [],
-      [],
-      [],
-      true,
-    );
-    return this.userRepository.create(user);
-  }
-
   async findAll(): Promise<User[]> {
     return this.userRepository.findAll();
   }
@@ -114,12 +83,5 @@ export class UserService {
     interactionId: string,
   ): Promise<void> {
     await this.userRepository.addGameInteraction(userId, interactionId);
-  }
-
-  async updatePassword(userId: string, newPassword: string): Promise<void> {
-    const user = await this.findById(userId);
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-    user.password = hashedPassword;
-    await this.userRepository.update(user);
   }
 }

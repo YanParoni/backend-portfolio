@@ -7,6 +7,8 @@ import {
   UseGuards,
   Res,
   Query,
+  Patch,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { AuthService } from '@/app/services/auth.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -67,10 +69,14 @@ export class AuthController {
       return {
         message:
           'OAuth users cannot reset their password through this service.',
+        success: false,
       };
     }
     await this.authService.requestPasswordReset(email);
-    return { message: 'Password reset email sent successfully' };
+    return {
+      message: 'Password reset email sent successfully',
+      success: true,
+    };
   }
 
   @Post('reset-password')
@@ -87,5 +93,21 @@ export class AuthController {
     }
     await this.authService.resetPassword(token, newPassword);
     return { message: 'Password reset successfully' };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('change-password')
+  async changePassword(
+    @Req() req: any,
+    @Body('currentPassword') currentPassword: string,
+    @Body('newPassword') newPassword: string,
+  ): Promise<any> {
+    const user = req.user;
+    await this.authService.changePassword(
+      user._id,
+      currentPassword,
+      newPassword,
+    );
+    return { message: 'Password changed successfully' };
   }
 }

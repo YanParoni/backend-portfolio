@@ -27,7 +27,7 @@ export class UserRepository implements IUserRepository {
       userDocument.reviews,
       userDocument.likes,
       userDocument.gameInteractions,
-      false,
+      userDocument.oauth,
     );
   }
 
@@ -46,6 +46,7 @@ export class UserRepository implements IUserRepository {
       reviews: user.reviews,
       likes: user.likes,
       gameInteractions: user.gameInteractions,
+      oauth: user.oauth,
     };
   }
 
@@ -53,6 +54,33 @@ export class UserRepository implements IUserRepository {
     const createdUser = new this.userModel(this.toSchema(user));
     const savedUser = await createdUser.save();
     return this.toDomain(savedUser);
+  }
+
+  async createOAuthUser(profile: any): Promise<UserEntity> {
+    const email = profile.emails?.[0]?.value;
+    const username =
+      profile.displayName ||
+      profile.name?.givenName ||
+      profile.emails?.[0]?.value;
+
+    const user = new UserEntity(
+      null,
+      username,
+      username,
+      email,
+      '',
+      profile.photos[0].value,
+      '',
+      false,
+      [],
+      [],
+      [],
+      [],
+      [],
+      [],
+      true,
+    );
+    return this.create(user);
   }
 
   async findAll(): Promise<UserEntity[]> {
@@ -87,6 +115,7 @@ export class UserRepository implements IUserRepository {
       .updateOne({ _id: userId }, { password: hashedPassword })
       .exec();
   }
+
   async addGameInteraction(
     userId: string,
     interactionId: string,

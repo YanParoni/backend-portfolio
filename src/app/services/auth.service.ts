@@ -5,20 +5,21 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { UserService } from '@/app/services/user.service';
+import { UserRepository } from '@/infra/repositories/user.repository';
 import { LoginUserDto } from '@/app/dto/login-user.dto';
 import { EmailService } from '@/app/services/email.service';
+import { User } from '@/domain/entities/user.entity';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly userService: UserService,
+    private readonly userRepository: UserRepository,
     private readonly jwtService: JwtService,
     private readonly emailService: EmailService,
   ) {}
 
   async validateUser(username: string, pass: string): Promise<any> {
-    const user = await this.userService.findByUsername(username);
+    const user = await this.userRepository.findByUsername(username);
     if (user && !user.oauth && (await bcrypt.compare(pass, user.password))) {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { password, ...result } = user;
@@ -28,29 +29,20 @@ export class AuthService {
   }
 
   async login(loginUserDto: LoginUserDto): Promise<{ accessToken: string }> {
-    const user = await this.userService.findByUsername(loginUserDto.username);
-    if (!user || user.oauth) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
-    const isPasswordMatching = await bcrypt.compare(
-      loginUserDto.password,
-      user.password,
+    const user = await this.userRepository.findByUsername(
+      loginUserDto.username,
     );
-    if (!isPasswordMatching) {
-      throw new UnauthorizedException('Invalid credentials');
+    if (!user) {
+      throw new UnauthorizedException('User not found');
     }
-    const payload = {
-      username: user.username,
-      sub: user.id,
-      profileImage: user?.profileImage || '',
-    };
-    return {
-      accessToken: this.jwtService.sign(payload),
-    };
+    if (await this.isLoginAllowed(user, loginUserDto.password)) {
+      return this.generateAccessToken(user);
+    }
+    throw new UnauthorizedException('Invalid credentials');
   }
 
   async requestPasswordReset(email: string): Promise<void> {
-    const user = await this.userService.findByEmail(email);
+    const user = await this.userRepository.findByEmail(email);
     if (!user) {
       throw new NotFoundException('User not found');
     }
@@ -59,22 +51,18 @@ export class AuthService {
       { expiresIn: '1h' },
     );
     const resetLink = `http://localhost:3001/user/reset-password?token=${token}`;
-    await this.emailService.sendMail(
-      email,
-      'Password Reset Request',
-      `Please click the link to reset your password: ${resetLink}`,
-    );
+    await this.emailService.sendMail(email, user.username, resetLink);
   }
 
   async resetPassword(token: string, newPassword: string): Promise<void> {
     const decoded = this.jwtService.verify(token);
     const userId = decoded.userId;
-    const user = await this.userService.findById(userId);
+    const user = await this.userRepository.findById(userId);
     if (!user) {
       throw new NotFoundException('User not found');
     }
     const hashedPassword = await bcrypt.hash(newPassword, 10);
-    await this.userService.updatePassword(userId, hashedPassword);
+    await this.userRepository.updatePassword(userId, hashedPassword);
   }
 
   async validateOAuthLogin(profile: any): Promise<string> {
@@ -82,34 +70,81 @@ export class AuthService {
     if (!email) {
       throw new UnauthorizedException('No email found in Google profile');
     }
-
-    let user = await this.userService.findByEmail(email);
+    let user = await this.userRepository.findByEmail(email);
     if (!user) {
-      user = await this.userService.createOAuthUser(profile);
+      user = await this.userRepository.createOAuthUser(profile);
     }
     const payload = {
       username: user.username,
       sub: user.id,
       profileImage: user.profileImage,
+      oauth: true,
+      needsPasswordSetup: !user.password,
     };
     return this.jwtService.sign(payload);
   }
 
   async findUserByEmail(email: string) {
-    const user = await this.userService.findByEmail(email);
+    const user = await this.userRepository.findByEmail(email);
     if (!user) {
       throw new NotFoundException('User not found');
     }
     return user;
   }
 
-  async getUserFromToken(token: string) {
+  async getUserFromToken(token: string): Promise<User> {
     const decoded = this.jwtService.verify(token);
-    const userId = decoded.userId;
-    const user = await this.userService.findById(userId);
+    const user = await this.userRepository.findById(decoded.sub);
     if (!user) {
       throw new NotFoundException('User not found');
     }
     return user;
+  }
+
+  async changePassword(
+    userId: string,
+    currentPassword: string,
+    newPassword: string,
+  ): Promise<void> {
+    const user = await this.userRepository.findById(userId);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    if (user.oauth && !user.password) {
+      await this.userRepository.updatePassword(userId, newPassword);
+      return;
+    }
+    const isPasswordValid = await bcrypt.compare(
+      currentPassword,
+      user.password,
+    );
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Current password is incorrect');
+    }
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await this.userRepository.updatePassword(userId, hashedPassword);
+  }
+
+  private async isLoginAllowed(
+    user: User,
+    providedPassword: string,
+  ): Promise<boolean> {
+    if (user.oauth && !user.password) {
+      return true;
+    }
+    return await bcrypt.compare(providedPassword, user.password);
+  }
+
+  private generateAccessToken(user: User): { accessToken: string } {
+    const payload = {
+      username: user.username,
+      sub: user.id,
+      profileImage: user.profileImage || '',
+      oauth: user.oauth,
+      needsPasswordSetup: user.oauth && !user.password,
+    };
+    return {
+      accessToken: this.jwtService.sign(payload),
+    };
   }
 }
