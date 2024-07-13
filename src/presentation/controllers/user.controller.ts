@@ -1,18 +1,21 @@
 import {
   Controller,
-  Post,
-  Get,
   Patch,
   Body,
   UseGuards,
   Request,
+  UseInterceptors,
+  UploadedFile,
+  Post,
+  Get,
   Param,
 } from '@nestjs/common';
 import { UserService } from '@/app/services/user.service';
-import { CreateUserDto } from '@/app/dto/create-user.dto';
 import { JwtAuthGuard } from '@/infra/guards/jwt-auth.guard';
-import { BlockedGuard } from '@/infra/guards/blocked.guard';
 import { AuthenticatedRequest } from '@/presentation/interfaces/authenticated-request.interface';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { CreateUserDto } from '@/app/dto/create-user.dto';
+import { BlockedGuard } from '@/infra/guards/blocked.guard';
 
 @Controller('users')
 export class UserController {
@@ -29,7 +32,16 @@ export class UserController {
     @Request() req: AuthenticatedRequest,
     @Body('base64Image') base64Image: string,
   ) {
-    return this.userService.updateProfileImage(req.user._id, base64Image);
+    return this.userService.updateProfileImage(req.user.sub, base64Image);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('header-image')
+  async updateHeaderImage(
+    @Request() req: AuthenticatedRequest,
+    @Body('base64Image') base64Image: string,
+  ) {
+    return this.userService.updateHeaderImage(req.user.sub, base64Image);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -38,7 +50,7 @@ export class UserController {
     @Request() req: AuthenticatedRequest,
     @Body('newBio') newBio: string,
   ) {
-    return this.userService.updateBio(req.user._id, newBio);
+    return this.userService.updateBio(req.user.sub, newBio);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -47,7 +59,7 @@ export class UserController {
     @Request() req: AuthenticatedRequest,
     @Body('newAt') newAt: string,
   ) {
-    return this.userService.updateAt(req.user._id, newAt);
+    return this.userService.updateAt(req.user.sub, newAt);
   }
 
   @UseGuards(JwtAuthGuard, BlockedGuard)

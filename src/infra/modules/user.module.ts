@@ -5,7 +5,7 @@ import { UserController } from '@/presentation/controllers/user.controller';
 import { UserRepository } from '@/infra/repositories/user.repository';
 import { UserSchema, UserSchemaSchema } from '@/infra/schemas/user.schema';
 import { AuthModule } from '@/infra/modules/auth.module';
-
+import { S3Service } from '@/app/services/s3.service';
 @Module({
   imports: [
     MongooseModule.forFeature([
@@ -14,7 +14,7 @@ import { AuthModule } from '@/infra/modules/auth.module';
     forwardRef(() => AuthModule),
   ],
   controllers: [UserController],
-  providers: [UserService, UserRepository],
+  providers: [UserService, UserRepository, S3Service],
   exports: [UserService, UserRepository],
 })
 export class UserModule {}

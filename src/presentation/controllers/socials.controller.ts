@@ -20,7 +20,7 @@ export class SocialsController {
     @Req() req: AuthenticatedRequest,
     @Param('id') userIdToFollow: string,
   ) {
-    await this.socialService.followUser(req.user._id, userIdToFollow);
+    await this.socialService.followUser(req.user.sub, userIdToFollow);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -29,7 +29,7 @@ export class SocialsController {
     @Req() req: AuthenticatedRequest,
     @Param('id') userIdToUnfollow: string,
   ) {
-    await this.socialService.unfollowUser(req.user._id, userIdToUnfollow);
+    await this.socialService.unfollowUser(req.user.sub, userIdToUnfollow);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -38,7 +38,7 @@ export class SocialsController {
     @Req() req: AuthenticatedRequest,
     @Param('id') userIdToBlock: string,
   ) {
-    await this.socialService.blockUser(req.user._id, userIdToBlock);
+    await this.socialService.blockUser(req.user.sub, userIdToBlock);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -47,7 +47,7 @@ export class SocialsController {
     @Req() req: AuthenticatedRequest,
     @Param('id') userIdToUnblock: string,
   ) {
-    await this.socialService.unblockUser(req.user._id, userIdToUnblock);
+    await this.socialService.unblockUser(req.user.sub, userIdToUnblock);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -56,7 +56,7 @@ export class SocialsController {
     @Req() req: AuthenticatedRequest,
     @Param('id') commentId: string,
   ) {
-    await this.socialService.blockComment(req.user._id, commentId);
+    await this.socialService.blockComment(req.user.sub, commentId);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -65,6 +65,6 @@ export class SocialsController {
     @Req() req: AuthenticatedRequest,
     @Param('id') commentId: string,
   ) {
-    await this.socialService.unblockComment(req.user._id, commentId);
+    await this.socialService.unblockComment(req.user.sub, commentId);
   }
 }

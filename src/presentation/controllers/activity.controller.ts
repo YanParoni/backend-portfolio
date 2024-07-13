@@ -10,6 +10,6 @@ export class ActivityController {
   @UseGuards(JwtAuthGuard)
   @Get('timeline')
   async getTimeline(@Req() req: AuthenticatedRequest) {
-    return this.activityService.getTimeline(req.user._id);
+    return this.activityService.getTimeline(req.user.sub);
   }
 }

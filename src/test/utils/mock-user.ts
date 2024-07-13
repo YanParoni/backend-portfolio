@@ -1,4 +1,3 @@
-// src/test/utils/mock-user.ts
 import { User } from '@/domain/entities/user.entity';
 
 export function createMockUser(overrides: Partial<User> = {}): User {

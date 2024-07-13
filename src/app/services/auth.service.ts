@@ -28,10 +28,16 @@ export class AuthService {
     return null;
   }
 
-  async login(loginUserDto: LoginUserDto): Promise<{ accessToken: string }> {
-    const user = await this.userRepository.findByUsername(
-      loginUserDto.username,
-    );
+  async getUserProfile(userId: string): Promise<User> {
+    const user = await this.userRepository.findById(userId);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return user;
+  }
+
+  async login(loginUserDto: LoginUserDto): Promise<{ token: string }> {
+    const user = await this.userRepository.findByEmail(loginUserDto.email);
     if (!user) {
       throw new UnauthorizedException('User not found');
     }
@@ -78,8 +84,10 @@ export class AuthService {
       username: user.username,
       sub: user.id,
       profileImage: user.profileImage,
+      headerImage: user.headerImage,
       oauth: true,
       needsPasswordSetup: !user.password,
+      bio: user.bio,
     };
     return this.jwtService.sign(payload);
   }
@@ -103,26 +111,33 @@ export class AuthService {
 
   async changePassword(
     userId: string,
-    currentPassword: string,
     newPassword: string,
-  ): Promise<void> {
+    currentPassword?: string,
+  ): Promise<{ message: string }> {
     const user = await this.userRepository.findById(userId);
     if (!user) {
       throw new NotFoundException('User not found');
     }
+
     if (user.oauth && !user.password) {
-      await this.userRepository.updatePassword(userId, newPassword);
-      return;
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      await this.userRepository.updatePassword(userId, hashedPassword);
+      return { message: 'Password set successfully for OAuth user' };
     }
-    const isPasswordValid = await bcrypt.compare(
-      currentPassword,
-      user.password,
-    );
-    if (!isPasswordValid) {
-      throw new UnauthorizedException('Current password is incorrect');
+
+    if (currentPassword) {
+      const isPasswordValid = await bcrypt.compare(
+        currentPassword,
+        user.password,
+      );
+      if (!isPasswordValid) {
+        throw new UnauthorizedException('Current password is incorrect');
+      }
     }
+
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     await this.userRepository.updatePassword(userId, hashedPassword);
+    return { message: 'Password changed successfully' };
   }
 
   private async isLoginAllowed(
@@ -135,16 +150,18 @@ export class AuthService {
     return await bcrypt.compare(providedPassword, user.password);
   }
 
-  private generateAccessToken(user: User): { accessToken: string } {
+  private generateAccessToken(user: User): { token: string } {
     const payload = {
       username: user.username,
       sub: user.id,
       profileImage: user.profileImage || '',
+      headerImage: user.headerImage || '',
       oauth: user.oauth,
       needsPasswordSetup: user.oauth && !user.password,
+      bio: user.bio,
     };
     return {
-      accessToken: this.jwtService.sign(payload),
+      token: this.jwtService.sign(payload),
     };
   }
 }

@@ -26,7 +26,7 @@ export class CommentController {
     req.headers['target-type'] = 'comment';
     return this.commentService.create(
       createCommentDto,
-      req.user._id,
+      req.user.sub,
       req.user.username,
       req.user.profileImage,
     );

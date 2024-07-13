@@ -15,7 +15,7 @@ export class LikeController {
   ) {
     req.headers['activity-type'] = 'like';
     req.headers['target-type'] = 'review';
-    return this.likeService.likeReview(req.user._id, reviewId);
+    return this.likeService.likeReview(req.user.sub, reviewId);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -26,6 +26,6 @@ export class LikeController {
   ) {
     req.headers['activity-type'] = 'like';
     req.headers['target-type'] = 'list';
-    return this.likeService.likeList(req.user._id, listId);
+    return this.likeService.likeList(req.user.sub, listId);
   }
 }

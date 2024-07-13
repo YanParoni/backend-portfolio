@@ -25,7 +25,7 @@ export class GameInteractionController {
   ) {
     req.headers['activity-type'] = liked ? 'like' : played ? 'played' : '';
     req.headers['target-type'] = 'game';
-    const userId = req.user._id;
+    const userId = req.user.sub;
     return this.interactionService.createInteraction(
       userId,
       gameId,

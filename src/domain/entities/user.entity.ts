@@ -6,6 +6,7 @@ export class User {
     public readonly email: string,
     public password: string,
     public profileImage: string,
+    public headerImage: string,
     public bio: string,
     public isPrivate: boolean,
     public followers: string[],
@@ -15,9 +16,8 @@ export class User {
     public likes: string[],
     public gameInteractions: string[],
     public oauth: boolean,
-  ) {
-    this.at = username;
-  }
+  ) {}
+
   addGameInteraction(interactionId: string): void {
     if (!this.gameInteractions.includes(interactionId)) {
       this.gameInteractions.push(interactionId);
@@ -74,6 +74,10 @@ export class User {
 
   updateProfileImage(newProfileImage: string): void {
     this.profileImage = newProfileImage;
+  }
+
+  updateHeaderImage(newHeaderImage: string): void {
+    this.headerImage = newHeaderImage;
   }
 
   updateBio(newBio: string): void {

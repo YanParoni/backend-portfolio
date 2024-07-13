@@ -2,6 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
 export type UserDocument = UserSchema & Document;
+
 @Schema()
 export class UserSchema {
   @Prop({ required: true, unique: true })
@@ -18,6 +19,9 @@ export class UserSchema {
 
   @Prop()
   profileImage: string;
+
+  @Prop()
+  headerImage: string;
 
   @Prop()
   bio: string;

@@ -25,13 +25,13 @@ export class ReviewController {
   ) {
     req.headers['activity-type'] = 'create';
     req.headers['target-type'] = 'review';
-    return this.reviewService.create(createReviewDto, req.user._id);
+    return this.reviewService.create(createReviewDto, req.user.sub);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('authenticated')
   async findAllAuthenticated(@Req() req: AuthenticatedRequest) {
-    return this.reviewService.findAll(req.user._id);
+    return this.reviewService.findAll(req.user.sub);
   }
 
   @Get('game/:gameTitle')

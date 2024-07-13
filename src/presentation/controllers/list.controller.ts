@@ -29,7 +29,7 @@ export class ListController {
     return this.listService.create(
       createListDto,
       req.user.username,
-      req.user._id,
+      req.user.sub,
     );
   }
 

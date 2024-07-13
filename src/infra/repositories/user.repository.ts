@@ -19,6 +19,7 @@ export class UserRepository implements IUserRepository {
       userDocument.email,
       userDocument.password,
       userDocument.profileImage,
+      userDocument.headerImage,
       userDocument.bio,
       userDocument.isPrivate,
       userDocument.followers,
@@ -38,6 +39,7 @@ export class UserRepository implements IUserRepository {
       email: user.email,
       password: user.password,
       profileImage: user.profileImage,
+      headerImage: user.headerImage,
       bio: user.bio,
       isPrivate: user.isPrivate,
       followers: user.followers,
@@ -62,7 +64,6 @@ export class UserRepository implements IUserRepository {
       profile.displayName ||
       profile.name?.givenName ||
       profile.emails?.[0]?.value;
-
     const user = new UserEntity(
       null,
       username,
@@ -70,6 +71,7 @@ export class UserRepository implements IUserRepository {
       email,
       '',
       profile.photos[0].value,
+      'https://playboxdd.s3.us-east-2.amazonaws.com/space-invaders.png',
       '',
       false,
       [],
@@ -103,11 +105,30 @@ export class UserRepository implements IUserRepository {
     return userDocument ? this.toDomain(userDocument) : null;
   }
 
+  async updateProfileImage(
+    userId: string,
+    profileImage: string,
+  ): Promise<void> {
+    await this.userModel.updateOne({ _id: userId }, { profileImage }).exec();
+  }
+
+  async updateHeaderImage(userId: string, headerImage: string): Promise<void> {
+    await this.userModel.updateOne({ _id: userId }, { headerImage }).exec();
+  }
+
+  async updateBio(userId: string, bio: string): Promise<void> {
+    await this.userModel.updateOne({ _id: userId }, { bio }).exec();
+  }
+
   async update(user: UserEntity): Promise<UserEntity> {
     const updatedUser = await this.userModel
       .findByIdAndUpdate(user.id, this.toSchema(user), { new: true })
       .exec();
     return this.toDomain(updatedUser);
+  }
+
+  async updateAt(userId: string, at: string): Promise<void> {
+    await this.userModel.updateOne({ _id: userId }, { at }).exec();
   }
 
   async updatePassword(userId: string, hashedPassword: string): Promise<void> {

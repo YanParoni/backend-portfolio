@@ -8,7 +8,6 @@ import {
   Res,
   Query,
   Patch,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { AuthService } from '@/app/services/auth.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -25,11 +24,14 @@ export class AuthController {
     private readonly jwtService: JwtService,
   ) {}
 
+  @Post('login')
+  async login(@Body() loginUserDto: LoginUserDto): Promise<{ token: string }> {
+    return this.authService.login(loginUserDto);
+  }
+
   @Get('google')
   @UseGuards(AuthGuard('google'))
-  async googleAuth(@Req() req) {
-    console.log('authed', req);
-  }
+  async googleAuth(@Req() req) {}
 
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
@@ -51,15 +53,10 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Get('profile')
-  getProfile(@Req() req: AuthenticatedRequest) {
-    return req.user;
-  }
-
-  @Post('login')
-  async login(
-    @Body() loginUserDto: LoginUserDto,
-  ): Promise<{ accessToken: string }> {
-    return this.authService.login(loginUserDto);
+  async getProfile(@Req() req: AuthenticatedRequest) {
+    const userId = req.user.sub;
+    const userProfile = await this.authService.getUserProfile(userId);
+    return userProfile;
   }
 
   @Post('reset-password-request')
@@ -68,7 +65,7 @@ export class AuthController {
     if (user.oauth) {
       return {
         message:
-          'OAuth users cannot reset their password through this service.',
+          'OAuth users cannot reset their password through this service. You need to be logged in.',
         success: false,
       };
     }
@@ -88,7 +85,7 @@ export class AuthController {
     if (user.oauth) {
       return {
         message:
-          'OAuth users cannot reset their password through this service.',
+          'OAuth users cannot reset their password through this service.Log in with continue with google',
       };
     }
     await this.authService.resetPassword(token, newPassword);
@@ -98,15 +95,15 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Patch('change-password')
   async changePassword(
-    @Req() req: any,
+    @Req() req: AuthenticatedRequest,
     @Body('currentPassword') currentPassword: string,
     @Body('newPassword') newPassword: string,
   ): Promise<any> {
     const user = req.user;
     await this.authService.changePassword(
-      user._id,
-      currentPassword,
+      user.sub,
       newPassword,
+      currentPassword,
     );
     return { message: 'Password changed successfully' };
   }
