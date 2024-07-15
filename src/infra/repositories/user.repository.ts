@@ -67,11 +67,11 @@ export class UserRepository implements IUserRepository {
     const user = new UserEntity(
       null,
       username,
-      username,
+      '@',
       email,
       '',
       profile.photos[0].value,
-      'https://playboxdd.s3.us-east-2.amazonaws.com/space-invaders.png',
+      '',
       '',
       false,
       [],

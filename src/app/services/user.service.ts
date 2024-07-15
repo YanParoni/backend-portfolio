@@ -27,7 +27,7 @@ export class UserService {
     const user = new User(
       null,
       createUserDto.username,
-      createUserDto.username,
+      createUserDto.at,
       createUserDto.email,
       hashedPassword,
       '',
@@ -97,7 +97,6 @@ export class UserService {
       'profile-image.jpg',
     );
     const newImageUrl = await this.s3Service.uploadFile(file);
-
     user.updateProfileImage(newImageUrl);
     await this.userRepository.updateProfileImage(userId, newImageUrl);
   }

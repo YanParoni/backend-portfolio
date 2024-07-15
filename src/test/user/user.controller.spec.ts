@@ -57,6 +57,7 @@ describe('UserController', () => {
         email: 'test@example.com',
         password: 'password',
         username: 'testuser',
+        at: '123',
       };
       const mockUser = createMockUser({
         email: 'test@example.com',

@@ -11,7 +11,6 @@ jest.mock('bcrypt');
 describe('UserService', () => {
   let userService: UserService;
   let userRepository: UserRepository;
-  let s3Service: S3Service;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -55,6 +54,7 @@ describe('UserService', () => {
         email: 'test@example.com',
         password: 'password',
         username: 'testuser',
+        at: '123',
       };
       const mockUser = new User(
         '1',
@@ -94,6 +94,7 @@ describe('UserService', () => {
         email: 'test@example.com',
         password: 'password',
         username: 'testuser',
+        at: '123',
       };
       const mockUser = new User(
         '1',

@@ -13,6 +13,10 @@ export class CreateUserDto {
   @IsString()
   password: string;
 
+  @IsNotEmpty()
+  @IsString()
+  at: string;
+
   @IsOptional()
   @IsString()
   profileImage?: string;

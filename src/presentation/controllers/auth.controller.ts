@@ -16,7 +16,15 @@ import { LoginUserDto } from '@/app/dto/login-user.dto';
 import { AuthenticatedRequest } from '@/presentation/interfaces/authenticated-request.interface';
 import { Response } from 'express';
 import { JwtService } from '@nestjs/jwt';
-
+import {
+  ApiTags,
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiBody,
+} from '@nestjs/swagger';
+import { ResetPasswordRequestDto } from '@/app/dto/reset-password-request.dto';
+@ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -25,16 +33,22 @@ export class AuthController {
   ) {}
 
   @Post('login')
+  @ApiOperation({ summary: 'User login' })
+  @ApiResponse({ status: 200, description: 'Login successful' })
+  @ApiResponse({ status: 401, description: 'Invalid credentials' })
+  @ApiBody({ type: LoginUserDto })
   async login(@Body() loginUserDto: LoginUserDto): Promise<{ token: string }> {
     return this.authService.login(loginUserDto);
   }
 
   @Get('google')
   @UseGuards(AuthGuard('google'))
+  @ApiOperation({ summary: 'Google OAuth login' })
   async googleAuth(@Req() req) {}
 
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
+  @ApiOperation({ summary: 'Google OAuth callback' })
   async googleAuthRedirect(@Req() req, @Res() res: Response) {
     const token = req.user.jwt;
     res.redirect(`http://localhost:3001/auth/success?token=${token}`);
@@ -42,6 +56,7 @@ export class AuthController {
   }
 
   @Get('validate-token')
+  @ApiOperation({ summary: 'Validate JWT token' })
   async validateToken(@Query('token') token: string) {
     try {
       const decoded = this.jwtService.verify(token);
@@ -52,28 +67,13 @@ export class AuthController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Get('profile')
+  @ApiOperation({ summary: 'Get user profile' })
   async getProfile(@Req() req: AuthenticatedRequest) {
     const userId = req.user.sub;
     const userProfile = await this.authService.getUserProfile(userId);
     return userProfile;
-  }
-
-  @Post('reset-password-request')
-  async requestPasswordReset(@Body('email') email: string) {
-    const user = await this.authService.findUserByEmail(email);
-    if (user.oauth) {
-      return {
-        message:
-          'OAuth users cannot reset their password through this service. You need to be logged in.',
-        success: false,
-      };
-    }
-    await this.authService.requestPasswordReset(email);
-    return {
-      message: 'Password reset email sent successfully',
-      success: true,
-    };
   }
 
   @Post('reset-password')
@@ -92,8 +92,31 @@ export class AuthController {
     return { message: 'Password reset successfully' };
   }
 
+  @Post('reset-password-request')
+  @ApiOperation({ summary: 'Request password reset' })
+  async requestPasswordReset(
+    @Body() requestPasswordReset: ResetPasswordRequestDto,
+  ) {
+    const { email } = requestPasswordReset;
+    const user = await this.authService.findUserByEmail(email);
+    if (user.oauth) {
+      return {
+        message:
+          'OAuth users cannot reset their password through this service. You need to be logged in.',
+        success: false,
+      };
+    }
+    await this.authService.requestPasswordReset(email);
+    return {
+      message: 'Password reset email sent successfully',
+      success: true,
+    };
+  }
+
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Patch('change-password')
+  @ApiOperation({ summary: 'Change user password' })
   async changePassword(
     @Req() req: AuthenticatedRequest,
     @Body('currentPassword') currentPassword: string,

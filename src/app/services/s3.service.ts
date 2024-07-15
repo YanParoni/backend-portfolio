@@ -3,7 +3,6 @@ import {
   PutObjectCommand,
   DeleteObjectCommand,
 } from '@aws-sdk/client-s3';
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { ConfigService } from '@nestjs/config';
 import { Injectable, Logger } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
@@ -13,6 +12,7 @@ export class S3Service {
   private readonly s3Client: S3Client;
   private readonly logger = new Logger(S3Service.name);
   private readonly bucketName: string;
+  private readonly s3BaseUrl: string;
 
   constructor(private readonly configService: ConfigService) {
     this.s3Client = new S3Client({
@@ -25,6 +25,7 @@ export class S3Service {
       },
     });
     this.bucketName = this.configService.get<string>('S3_BUCKET_NAME');
+    this.s3BaseUrl = `https://${this.bucketName}.s3.${this.configService.get<string>('AWS_REGION')}.amazonaws.com/`;
   }
 
   async uploadFile(file: Express.Multer.File): Promise<string> {
@@ -40,9 +41,7 @@ export class S3Service {
 
     try {
       await this.s3Client.send(command);
-      const url = await getSignedUrl(this.s3Client, command, {
-        expiresIn: 3600,
-      });
+      const url = `${this.s3BaseUrl}${fileName}`;
       this.logger.log(`File uploaded successfully. URL: ${url}`);
       return url;
     } catch (error) {
