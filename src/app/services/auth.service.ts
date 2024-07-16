@@ -56,7 +56,7 @@ export class AuthService {
       { userId: user.id, name: user.username },
       { expiresIn: '1h' },
     );
-    const resetLink = `http://localhost:3001/user/reset-password?token=${token}`;
+    const resetLink = `https://design-template-ivory.vercel.app/user/reset-password?token=${token}`;
     await this.emailService.sendMail(email, user.username, resetLink);
   }
 
