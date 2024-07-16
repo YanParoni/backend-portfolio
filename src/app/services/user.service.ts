@@ -17,12 +17,25 @@ export class UserService {
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
-    const existingUser = await this.userRepository.findByEmail(
+    const existingEmail = await this.userRepository.findByEmail(
       createUserDto.email,
     );
-    if (existingUser) {
+    if (existingEmail) {
       throw new ConflictException('Email already in use');
     }
+
+    const existingUsername = await this.userRepository.findByUsername(
+      createUserDto.username,
+    );
+    if (existingUsername) {
+      throw new ConflictException('Username already in use');
+    }
+
+    const existingAt = await this.userRepository.findByAt(createUserDto.at);
+    if (existingAt) {
+      throw new ConflictException('Handle (@) already in use');
+    }
+
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
     const user = new User(
       null,
@@ -44,7 +57,6 @@ export class UserService {
     );
     return this.userRepository.create(user);
   }
-
   async findAll(): Promise<User[]> {
     return this.userRepository.findAll();
   }

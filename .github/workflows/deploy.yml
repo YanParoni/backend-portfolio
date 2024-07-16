@@ -6,7 +6,7 @@ on:
       - main
 
 env:
-  AWS_INSTANCE_SG_ID: ${{ secrets.AWS_INSTANCE_SG_ID }}
+  AWS_INSTANCE_SG_ID: ${{ secrets.AWS_INSTANCE_SG_ID }} 
   AWS_REGION: ${{ secrets.AWS_REGION }}
 
 jobs:
@@ -36,7 +36,7 @@ jobs:
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ env.AWS_REGION }}
+        aws-region: ${{ secrets.AWS_REGION }}
 
     - name: Get runner IP address
       id: ip
@@ -56,9 +56,18 @@ jobs:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USER }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
-        source: "./"
-        target: "/home/ubuntu/my-app"
-        rm: true
+        source: "dist/"
+        target: "/home/ubuntu/my-app/dist"
+
+    - name: Run SSH commands
+      uses: appleboy/ssh-action@v0.1.3
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USER }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script: |
+          cd /home/ubuntu/my-app
+          pm2 restart all || sudo pm2 start dist/main.js --name "my-game-app"
 
     - name: Revoke runner IP address
       run: |

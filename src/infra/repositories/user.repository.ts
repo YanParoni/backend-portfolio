@@ -105,6 +105,11 @@ export class UserRepository implements IUserRepository {
     return userDocument ? this.toDomain(userDocument) : null;
   }
 
+  async findByAt(at: string): Promise<UserEntity | null> {
+    const userDocument = await this.userModel.findOne({ at }).exec();
+    return userDocument ? this.toDomain(userDocument) : null;
+  }
+
   async updateProfileImage(
     userId: string,
     profileImage: string,

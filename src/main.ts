@@ -1,19 +1,43 @@
 import * as dotenv from 'dotenv';
 dotenv.config();
-import * as express from 'express';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { UserModule } from './infra/modules/user.module';
-import { AuthModule } from './infra/modules/auth.module';
-import { GameInteractionModule } from './infra/modules/game-interaction.module';
+import * as fs from 'fs';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const isProduction = process.env.NODE_ENV === 'production';
+
+  const httpsOptions = isProduction
+    ? {
+        key: fs.readFileSync(
+          '/etc/letsencrypt/live/playboxdapi.online/privkey.pem',
+        ),
+        cert: fs.readFileSync(
+          '/etc/letsencrypt/live/playboxdapi.online/fullchain.pem',
+        ),
+      }
+    : undefined;
+
+  const app = await NestFactory.create(
+    AppModule,
+    httpsOptions ? { httpsOptions } : {},
+  );
+
+  app.enableCors({
+    origin: isProduction
+      ? [
+          'https://design-template-ivory.vercel.app',
+          'https://playboxdapi.online',
+        ]
+      : 'http://localhost:3001',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    credentials: true,
+    allowedHeaders: 'Content-Type, Authorization',
+  });
+
   app.useGlobalPipes(new ValidationPipe());
-  app.use(express.json({ limit: '50mb' }));
-  app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
   const config = new DocumentBuilder()
     .setTitle('Playboxdd Documentation')
@@ -22,12 +46,10 @@ async function bootstrap() {
     .addBearerAuth()
     .build();
 
-  const document = SwaggerModule.createDocument(app, config, {
-    include: [AuthModule, UserModule, GameInteractionModule],
-  });
-
+  const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
   await app.listen(3000);
 }
+
 bootstrap();

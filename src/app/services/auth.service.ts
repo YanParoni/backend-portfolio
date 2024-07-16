@@ -48,21 +48,22 @@ export class AuthService {
   }
 
   async requestPasswordReset(email: string): Promise<void> {
+    const redirect = process.env.FRONTEND;
     const user = await this.userRepository.findByEmail(email);
     if (!user) {
       throw new NotFoundException('User not found');
     }
     const token = this.jwtService.sign(
-      { userId: user.id, name: user.username },
+      { sub: user.id, name: user.username },
       { expiresIn: '1h' },
     );
-    const resetLink = `https://design-template-ivory.vercel.app/user/reset-password?token=${token}`;
+    const resetLink = `${redirect}/user/reset-password?token=${token}`;
     await this.emailService.sendMail(email, user.username, resetLink);
   }
 
   async resetPassword(token: string, newPassword: string): Promise<void> {
     const decoded = this.jwtService.verify(token);
-    const userId = decoded.userId;
+    const userId = decoded.sub;
     const user = await this.userRepository.findById(userId);
     if (!user) {
       throw new NotFoundException('User not found');
@@ -100,6 +101,7 @@ export class AuthService {
 
   async getUserFromToken(token: string): Promise<User> {
     const decoded = this.jwtService.verify(token);
+    console.log(decoded);
     const user = await this.userRepository.findById(decoded.sub);
     if (!user) {
       throw new NotFoundException('User not found');

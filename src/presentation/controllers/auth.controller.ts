@@ -51,7 +51,8 @@ export class AuthController {
   @ApiOperation({ summary: 'Google OAuth callback' })
   async googleAuthRedirect(@Req() req, @Res() res: Response) {
     const token = req.user.jwt;
-    res.redirect(`https://design-template-ivory.vercel.app/auth/success?token=${token}`);
+    const redirect = process.env.FRONTEND;
+    res.redirect(`${redirect}/auth/success?token=${token}`);
     return { token };
   }
 
