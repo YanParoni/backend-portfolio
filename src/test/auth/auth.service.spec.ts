@@ -124,7 +124,7 @@ describe('AuthService', () => {
   describe('resetPassword', () => {
     it('should reset the password if token is valid', async () => {
       const mockUser = { id: '1', email: 'test@example.com' } as User;
-      (jwtService.verify as jest.Mock).mockReturnValue({ userId: '1' });
+      (jwtService.verify as jest.Mock).mockReturnValue({ sub: '1' });
       jest.spyOn(userRepository, 'findById').mockResolvedValue(mockUser);
       (bcrypt.hash as jest.Mock).mockResolvedValue('hashedPassword');
       jest.spyOn(userRepository, 'updatePassword').mockResolvedValue(null);

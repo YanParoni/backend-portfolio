@@ -11,6 +11,7 @@ jest.mock('bcrypt');
 describe('UserService', () => {
   let userService: UserService;
   let userRepository: UserRepository;
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -19,6 +20,8 @@ describe('UserService', () => {
           provide: UserRepository,
           useValue: {
             findByEmail: jest.fn(),
+            findByUsername: jest.fn(),
+            findByAt: jest.fn(),
             findById: jest.fn(),
             create: jest.fn(),
             updateProfileImage: jest.fn(),
@@ -57,7 +60,7 @@ describe('UserService', () => {
       const mockUser = new User(
         '1',
         'testuser',
-        'testuser',
+        '123',
         'test@example.com',
         await bcrypt.hash('password', 10),
         '',
@@ -74,15 +77,17 @@ describe('UserService', () => {
       );
 
       jest.spyOn(userRepository, 'findByEmail').mockResolvedValue(null);
+      jest.spyOn(userRepository, 'findByUsername').mockResolvedValue(null);
+      jest.spyOn(userRepository, 'findByAt').mockResolvedValue(null);
       (bcrypt.hash as jest.Mock).mockResolvedValue('hashedPassword');
       jest.spyOn(userRepository, 'create').mockResolvedValue(mockUser);
 
       const result = await userService.create(createUserDto);
 
       expect(result).toEqual(mockUser);
-      expect(userRepository.findByEmail).toHaveBeenCalledWith(
-        'test@example.com',
-      );
+      expect(userRepository.findByEmail).toHaveBeenCalledWith('test@example.com');
+      expect(userRepository.findByUsername).toHaveBeenCalledWith('testuser');
+      expect(userRepository.findByAt).toHaveBeenCalledWith('123');
       expect(bcrypt.hash).toHaveBeenCalledWith('password', 10);
       expect(userRepository.create).toHaveBeenCalledWith(expect.any(User));
     });
@@ -97,7 +102,7 @@ describe('UserService', () => {
       const mockUser = new User(
         '1',
         'testuser',
-        'testuser',
+        '123',
         'test@example.com',
         'hashedPassword',
         '',
@@ -115,9 +120,72 @@ describe('UserService', () => {
 
       jest.spyOn(userRepository, 'findByEmail').mockResolvedValue(mockUser);
 
-      await expect(userService.create(createUserDto)).rejects.toThrow(
-        ConflictException,
+      await expect(userService.create(createUserDto)).rejects.toThrow(ConflictException);
+    });
+
+    it('should throw ConflictException if username is already in use', async () => {
+      const createUserDto = {
+        email: 'test@example.com',
+        password: 'password',
+        username: 'testuser',
+        at: '123',
+      };
+      const mockUser = new User(
+        '1',
+        'testuser',
+        '123',
+        'test@example.com',
+        'hashedPassword',
+        '',
+        '',
+        '',
+        false,
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        false,
       );
+
+      jest.spyOn(userRepository, 'findByEmail').mockResolvedValue(null);
+      jest.spyOn(userRepository, 'findByUsername').mockResolvedValue(mockUser);
+
+      await expect(userService.create(createUserDto)).rejects.toThrow(ConflictException);
+    });
+
+    it('should throw ConflictException if handle (@) is already in use', async () => {
+      const createUserDto = {
+        email: 'test@example.com',
+        password: 'password',
+        username: 'testuser',
+        at: '123',
+      };
+      const mockUser = new User(
+        '1',
+        'testuser',
+        '123',
+        'test@example.com',
+        'hashedPassword',
+        '',
+        '',
+        '',
+        false,
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        false,
+      );
+
+      jest.spyOn(userRepository, 'findByEmail').mockResolvedValue(null);
+      jest.spyOn(userRepository, 'findByUsername').mockResolvedValue(null);
+      jest.spyOn(userRepository, 'findByAt').mockResolvedValue(mockUser);
+
+      await expect(userService.create(createUserDto)).rejects.toThrow(ConflictException);
     });
   });
 
@@ -126,7 +194,7 @@ describe('UserService', () => {
       const mockUser = new User(
         '1',
         'testuser',
-        'testuser',
+        '123',
         'test@example.com',
         'hashedPassword',
         '',
@@ -153,9 +221,7 @@ describe('UserService', () => {
     it('should throw NotFoundException if user is not found', async () => {
       jest.spyOn(userRepository, 'findById').mockResolvedValue(null);
 
-      await expect(userService.findById('1')).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(userService.findById('1')).rejects.toThrow(NotFoundException);
     });
   });
 });
