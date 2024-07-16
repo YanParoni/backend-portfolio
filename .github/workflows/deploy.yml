@@ -50,6 +50,14 @@ jobs:
           --port 22 \
           --cidr ${{ steps.ip.outputs.ipv4 }}/32
 
+    - name: Add SSH rule for runner IP
+      run: |
+        aws ec2 authorize-security-group-ingress \
+          --group-id $AWS_INSTANCE_SG_ID \
+          --protocol tcp \
+          --port 22 \
+          --cidr ${{ steps.ip.outputs.ipv4 }}/32
+
     - name: Deploy to EC2
       uses: appleboy/scp-action@v0.1.3
       with:
