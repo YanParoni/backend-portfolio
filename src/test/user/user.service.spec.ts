@@ -85,7 +85,9 @@ describe('UserService', () => {
       const result = await userService.create(createUserDto);
 
       expect(result).toEqual(mockUser);
-      expect(userRepository.findByEmail).toHaveBeenCalledWith('test@example.com');
+      expect(userRepository.findByEmail).toHaveBeenCalledWith(
+        'test@example.com',
+      );
       expect(userRepository.findByUsername).toHaveBeenCalledWith('testuser');
       expect(userRepository.findByAt).toHaveBeenCalledWith('123');
       expect(bcrypt.hash).toHaveBeenCalledWith('password', 10);
@@ -120,7 +122,9 @@ describe('UserService', () => {
 
       jest.spyOn(userRepository, 'findByEmail').mockResolvedValue(mockUser);
 
-      await expect(userService.create(createUserDto)).rejects.toThrow(ConflictException);
+      await expect(userService.create(createUserDto)).rejects.toThrow(
+        ConflictException,
+      );
     });
 
     it('should throw ConflictException if username is already in use', async () => {
@@ -152,7 +156,9 @@ describe('UserService', () => {
       jest.spyOn(userRepository, 'findByEmail').mockResolvedValue(null);
       jest.spyOn(userRepository, 'findByUsername').mockResolvedValue(mockUser);
 
-      await expect(userService.create(createUserDto)).rejects.toThrow(ConflictException);
+      await expect(userService.create(createUserDto)).rejects.toThrow(
+        ConflictException,
+      );
     });
 
     it('should throw ConflictException if handle (@) is already in use', async () => {
@@ -185,7 +191,9 @@ describe('UserService', () => {
       jest.spyOn(userRepository, 'findByUsername').mockResolvedValue(null);
       jest.spyOn(userRepository, 'findByAt').mockResolvedValue(mockUser);
 
-      await expect(userService.create(createUserDto)).rejects.toThrow(ConflictException);
+      await expect(userService.create(createUserDto)).rejects.toThrow(
+        ConflictException,
+      );
     });
   });
 
@@ -221,7 +229,9 @@ describe('UserService', () => {
     it('should throw NotFoundException if user is not found', async () => {
       jest.spyOn(userRepository, 'findById').mockResolvedValue(null);
 
-      await expect(userService.findById('1')).rejects.toThrow(NotFoundException);
+      await expect(userService.findById('1')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 });

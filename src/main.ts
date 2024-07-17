@@ -11,11 +11,9 @@ async function bootstrap() {
 
   const httpsOptions = isProduction
     ? {
-        key: fs.readFileSync(
-          '/etc/letsencrypt/live/playboxdapi.online/privkey.pem',
-        ),
+        key: fs.readFileSync('/home/ubuntu/certificates/privkey.pem'),
         cert: fs.readFileSync(
-          '/etc/letsencrypt/live/playboxdapi.online/fullchain.pem',
+          '/home/ubuntu/certificates/playboxdapi.online/fullchain.pem',
         ),
       }
     : undefined;
