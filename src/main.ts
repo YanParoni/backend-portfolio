@@ -12,9 +12,7 @@ async function bootstrap() {
   const httpsOptions = isProduction
     ? {
         key: fs.readFileSync('/home/ubuntu/certificates/privkey.pem'),
-        cert: fs.readFileSync(
-          '/home/ubuntu/certificates/fullchain.pem',
-        ),
+        cert: fs.readFileSync('/home/ubuntu/certificates/fullchain.pem'),
       }
     : undefined;
 

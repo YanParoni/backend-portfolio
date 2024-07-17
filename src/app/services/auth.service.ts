@@ -41,6 +41,11 @@ export class AuthService {
     if (!user) {
       throw new UnauthorizedException('User not found');
     }
+    if (user.oauth && !user.password) {
+      throw new UnauthorizedException(
+        'OAuth users need to set a password before logging in with email and password.',
+      );
+    }
     if (await this.isLoginAllowed(user, loginUserDto.password)) {
       return this.generateAccessToken(user);
     }
@@ -101,7 +106,6 @@ export class AuthService {
 
   async getUserFromToken(token: string): Promise<User> {
     const decoded = this.jwtService.verify(token);
-    console.log(decoded);
     const user = await this.userRepository.findById(decoded.sub);
     if (!user) {
       throw new NotFoundException('User not found');
