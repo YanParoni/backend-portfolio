@@ -76,6 +76,7 @@ jobs:
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
           cd /home/ubuntu/my-app
+          cp /home/ubuntu/env-backup/.env /home/ubuntu/my-app/.env
           npm install
           npm run build
           sudo chmod 644 /etc/letsencrypt/live/playboxdapi.online/privkey.pem
