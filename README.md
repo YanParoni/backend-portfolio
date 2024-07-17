@@ -7,10 +7,9 @@ Welcome to the Playboxd backend documentation. This document provides an overvie
 - [Getting Started](#getting-started)
 - [Environment Variables](#environment-variables)
 - [API Documentation](#api-documentation)
-- [Authentication](#authentication)
-- [WebSocket](#websocket)
 - [Running Tests](#running-tests)
 - [Deployment](#deployment)
+- [Contact](#contact)
 
 ## Introduction
 
