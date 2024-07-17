@@ -84,7 +84,7 @@ jobs:
         username: ${{ secrets.USER }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
-          cd /home/ubuntu/my-app
+          cd /home/ubuntu/my-app/dist
           pm2 restart all || sudo pm2 start main.js --name "my-game-app"
 
     - name: Revoke runner IP address
