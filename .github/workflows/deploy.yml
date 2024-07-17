@@ -59,6 +59,15 @@ jobs:
           --port 22 \
           --cidr ${{ steps.ip.outputs.ipv4 }}/32
 
+    - name: Clean EC2 directory
+      uses: appleboy/ssh-action@v0.1.3
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USER }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script: |
+          rm -rf /home/ubuntu/my-app
+
     - name: Deploy to EC2
       uses: appleboy/scp-action@v0.1.3
       with:
