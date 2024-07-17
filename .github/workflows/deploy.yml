@@ -68,15 +68,6 @@ jobs:
         source: "dist/"
         target: "/home/ubuntu/my-app"
 
-    - name: Verify deployment directory contents
-      uses: appleboy/ssh-action@v0.1.3
-      with:
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.USER }}
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
-        script: |
-          ls -la /home/ubuntu/my-app
-
     - name: Run SSH commands
       uses: appleboy/ssh-action@v0.1.3
       with:
@@ -85,7 +76,12 @@ jobs:
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
           cd /home/ubuntu/my-app/dist
-          pm2 restart all || sudo pm2 start main.js --name "my-game-app"
+          pm2 stop all && pm2 delete all
+          pm2 start dist/main.js --name "my-game-app" --update-env
+          pm2 save
+          pm2 startup
+          sudo env PATH=$PATH:/usr/bin pm2 startup systemd -u $USER --hp /home/$USER
+          pm2 list
 
     - name: Revoke runner IP address
       run: |
