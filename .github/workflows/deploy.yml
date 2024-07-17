@@ -92,9 +92,9 @@ jobs:
           sudo chmod 644 /etc/letsencrypt/live/playboxdapi.online/fullchain.pem
           sudo chown $USER /etc/letsencrypt/live/playboxdapi.online/privkey.pem
           sudo chown $USER /etc/letsencrypt/live/playboxdapi.online/fullchain.pem
-          pm2 stop all && pm2 delete all
-          pm2 start dist/main.js --name "my-game-app" --update-env
-          pm2 save
+          sudo pm2 stop all && pm2 delete all
+          sudo pm2 start dist/main.js --name "my-game-app" --update-env
+          sudo pm2 save
           sudo env PATH=$PATH:/usr/bin pm2 startup systemd -u $USER --hp /home/$USER
           pm2 list
 
