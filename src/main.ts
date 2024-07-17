@@ -13,7 +13,7 @@ async function bootstrap() {
     ? {
         key: fs.readFileSync('/home/ubuntu/certificates/privkey.pem'),
         cert: fs.readFileSync(
-          '/home/ubuntu/certificates/playboxdapi.online/fullchain.pem',
+          '/home/ubuntu/certificates/fullchain.pem',
         ),
       }
     : undefined;
