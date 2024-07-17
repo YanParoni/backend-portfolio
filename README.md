@@ -58,27 +58,27 @@ AWS_REGION=us-east-2
 S3_BUCKET_NAME=your bucket
 FRONTEND=http://localhost:3001
 ````
-### 4. **API Documentation**
+###  API Documentation
 
 NestJS with Swagger makes it easy to document your API. Swagger can be accessed at `http://localhost:3000/api`.
 
 Currently there only user auth and game interactions modules are properly documented
 
 
-### 5. **Running Tests**
+### Running Tests
 
 ```markdown
 The project includes at the moment only unit tests.
 
 To run the unit tests: yarn test or npm run test
 ```
-### 6. **Deployment**
+### Deployment
 
 This project was deployed at aws ec2, there are a couple of secrets that you will need for more information go to appleboy-ssh
 
 - **Appleboy SSH Action:** [appleboy/ssh-action](https://github.com/appleboy/ssh-action)
 
-### 7. **Contact**
+### Contact
 
 Hit me at:
 
